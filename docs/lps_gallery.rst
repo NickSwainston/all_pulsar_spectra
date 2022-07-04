@@ -1,4 +1,0 @@
-
-Log Parabolic Spectrum Gallery
-==============================
-

@@ -6,7 +6,6 @@ df = pd.read_csv('all_pulsar_fits.csv')
 # grab model specific data frames
 spl_df  = df[df["Model"] == "simple_power_law"]
 bpl_df  = df[df["Model"] == "broken_power_law"]
-lps_df  = df[df["Model"] == "log_parabolic_spectrum"]
 hfto_df = df[df["Model"] == "high_frequency_cut_off_power_law"]
 lfto_df = df[df["Model"] == "low_frequency_turn_over_power_law"]
 dtos_df = df[df["Model"] == "double_turn_over_spectrum"]
@@ -26,7 +25,6 @@ Pulsar Spectra all pulsars fit results
 
    spl_gallery
    bpl_gallery
-   lps_gallery
    lfto_gallery
    hfco_gallery
    dtos_gallery
@@ -38,9 +36,9 @@ Single Power Law Results
 
 ''')
     for index, row in spl_df.iterrows():
-        data_str = f'   "{row["Pulsar"]}", '
-        for val, error in [("pl_a", "pl_u_a")]:
-            if "_v" in val:
+        data_str = f'   ":ref:`{row["Pulsar"]}`", '
+        for val, error in [("a", "u_a")]:
+            if "v" in val:
                 data_str += f'"{int(row[val]/1e6):d}±{int(row[error]/1e6):d}", '
             else:
                 data_str += f'"{row[val]:.2f}±{row[error]:.2f}", '
@@ -56,27 +54,9 @@ Broken Power Law Results
 
 ''')
     for index, row in bpl_df.iterrows():
-        data_str = f'   "{row["Pulsar"]}", '
-        for val, error in [("bpl_vb", "bpl_u_vb"), ("bpl_a1", "bpl_u_a1"), ("bpl_a2","bpl_u_a2")]:
-            if "_v" in val:
-                data_str += f'"{int(row[val]/1e6):d}±{int(row[error]/1e6):d}", '
-            else:
-                data_str += f'"{row[val]:.2f}±{row[error]:.2f}", '
-        file.write(f'{data_str[:-2]}\n')
-
-    file.write(f'''
-
-
-Log Parabolic Spectrum Results
-------------------------------
-.. csv-table::
-   :header: "Pulsar", "vpeak (MHz)", "a", "b", "c"
-
-''')
-    for index, row in lps_df.iterrows():
-        data_str = f'   "{row["Pulsar"]}", '
-        for val, error in [("lps_v_peak", "lps_u_v_peak"), ("lps_a", "lps_u_a"), ("lps_b", "lps_u_b"), ("lps_c", "lps_u_c")]:
-            if "_v" in val:
+        data_str = f'   ":ref:`{row["Pulsar"]}`", '
+        for val, error in [("vb", "u_vb"), ("a1", "u_a1"), ("a2","u_a2")]:
+            if "v" in val:
                 data_str += f'"{int(row[val]/1e6):d}±{int(row[error]/1e6):d}", '
             else:
                 data_str += f'"{row[val]:.2f}±{row[error]:.2f}", '
@@ -92,9 +72,9 @@ Low Frequency Turn Over Results
 
 ''')
     for index, row in lfto_df.iterrows():
-        data_str = f'   "{row["Pulsar"]}", '
-        for val, error in [("lfto_vpeak", "lfto_u_vpeak"), ("lfto_a", "lfto_u_a"), ("lfto_beta", "lfto_u_beta")]:
-            if "_v" in val:
+        data_str = f'   ":ref:`{row["Pulsar"]}`", '
+        for val, error in [("vpeak", "u_vpeak"), ("a", "u_a"), ("beta", "u_beta")]:
+            if "v" in val:
                 data_str += f'"{int(row[val]/1e6):d}±{int(row[error]/1e6):d}", '
             else:
                 data_str += f'"{row[val]:.2f}±{row[error]:.2f}", '
@@ -110,9 +90,9 @@ High Frequency Cut Off Results
 
 ''')
     for index, row in hfto_df.iterrows():
-        data_str = f'   "{row["Pulsar"]}", '
-        for val, error in [("hfco_vc", "hfco_u_vc"), ("hfco_a", "hfco_u_a")]:
-            if "_v" in val:
+        data_str = f'   ":ref:`{row["Pulsar"]}`", '
+        for val, error in [("vc", "u_vc"), ("a", "u_a")]:
+            if "v" in val:
                 data_str += f'"{int(row[val]/1e6):d}±{int(row[error]/1e6):d}", '
             else:
                 data_str += f'"{row[val]:.2f}±{row[error]:.2f}", '
@@ -128,9 +108,9 @@ Double Turn Over Spectrum Results
 
 ''')
     for index, row in dtos_df.iterrows():
-        data_str = f'   "{row["Pulsar"]}", '
-        for val, error in [("dtos_vc", "dtos_u_vc"), ("dtos_vpeak", "dtos_u_vpeak"), ("dtos_a", "dtos_u_a"), ("dtos_beta", "dtos_u_beta")]:
-            if "_v" in val:
+        data_str = f'   ":ref:`{row["Pulsar"]}`", '
+        for val, error in [("vc", "u_vc"), ("vpeak", "u_vpeak"), ("a", "u_a"), ("beta", "u_beta")]:
+            if "v" in val:
                 data_str += f'"{int(row[val]/1e6):d}±{int(row[error]/1e6):d}", '
             else:
                 data_str += f'"{row[val]:.2f}±{row[error]:.2f}", '
@@ -146,7 +126,7 @@ No Model Results
 
 ''')
     for index, row in nomod_df.iterrows():
-        file.write(f'   "{row["Pulsar"]}", "{row["N data flux"]}"')
+        file.write(f'   ":ref:`{row["Pulsar"]}`", "{row["N data flux"]}"')
 
 
 # Set up the gallerys
@@ -158,6 +138,8 @@ Simple Power Law Gallery
 ''')
     for index, row in spl_df.iterrows():
         file.write(f'''
+
+.. _{row["Pulsar"]}:
 
 {row["Pulsar"]}
 {"-"*len(row["Pulsar"])}
@@ -174,20 +156,7 @@ Broken Power Law Gallery
     for index, row in bpl_df.iterrows():
         file.write(f'''
 
-{row["Pulsar"]}
-{"-"*len(row["Pulsar"])}
-.. image:: best_fits/{row["Pulsar"]}_fit.png
-  :width: 800
-''')
-
-with open(f'{os.path.dirname(os.path.realpath(__file__))}/docs/lps_gallery.rst', 'w') as file:
-    file.write(f'''
-Log Parabolic Spectrum Gallery
-==============================
-
-''')
-    for index, row in lps_df.iterrows():
-        file.write(f'''
+.. _{row["Pulsar"]}:
 
 {row["Pulsar"]}
 {"-"*len(row["Pulsar"])}
@@ -204,6 +173,8 @@ Low Frequency Turn Over Gallery
     for index, row in lfto_df.iterrows():
         file.write(f'''
 
+.. _{row["Pulsar"]}:
+
 {row["Pulsar"]}
 {"-"*len(row["Pulsar"])}
 .. image:: best_fits/{row["Pulsar"]}_fit.png
@@ -219,6 +190,8 @@ High Frequency Cut Off Gallery
     for index, row in hfto_df.iterrows():
         file.write(f'''
 
+.. _{row["Pulsar"]}:
+
 {row["Pulsar"]}
 {"-"*len(row["Pulsar"])}
 .. image:: best_fits/{row["Pulsar"]}_fit.png
@@ -233,6 +206,8 @@ Double Turn Over Spectrum Gallery
 ''')
     for index, row in dtos_df.iterrows():
         file.write(f'''
+
+.. _{row["Pulsar"]}:
 
 {row["Pulsar"]}
 {"-"*len(row["Pulsar"])}

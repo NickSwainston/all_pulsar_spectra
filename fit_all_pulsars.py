@@ -34,50 +34,28 @@ output_df = pd.DataFrame(
         "N data flux",
         "Min freq (MHz)",
         "Max freq (MHz)",
-        "pl_a",
-        "pl_u_a",
-        "pl_c"      ,
-        "pl_u_c"      ,
-        "bpl_vb"    ,
-        "bpl_u_vb"    ,
-        "bpl_a1"    ,
-        "bpl_u_a1"    ,
-        "bpl_a2"    ,
-        "bpl_u_a2"    ,
-        "bpl_c"     ,
-        "bpl_u_c"     ,
+        "a"         ,
+        "u_a"       ,
+        "c"         ,
+        "u_c"       ,
+        "vb"        ,
+        "u_vb"      ,
+        "a1"        ,
+        "u_a1"      ,
+        "a2"        ,
+        "u_a2"      ,
+        "vc"        ,
+        "u_vc"      ,
+        "vpeak"     ,
+        "u_vpeak"   ,
+        "beta"      ,
+        "u_beta"    ,
         "lps_a"     ,
-        "lps_u_a"     ,
+        "lps_u_a"   ,
         "lps_b"     ,
-        "lps_u_b"     ,
+        "lps_u_b"   ,
         "lps_c"     ,
-        "lps_u_c"     ,
-        "lps_v_peak",
-        "lps_u_v_peak",
-        "hfco_vc"   ,
-        "hfco_u_vc"   ,
-        "hfto_a"    ,
-        "hfto_u_a"    ,
-        "hfco_c"    ,
-        "hfco_u_c"    ,
-        "lfto_vpeak"   ,
-        "lfto_u_vpeak" ,
-        "lfto_a"    ,
-        "lfto_u_a"    ,
-        "lfto_c"    ,
-        "lfto_u_c"    ,
-        "lfto_beta" ,
-        "lfto_u_beta" ,
-        "dtos_vc"   ,
-        "dtos_u_vc"   ,
-        "dtos_vpeak"   ,
-        "dtos_u_vpeak" ,
-        "dtos_a"    ,
-        "dtos_u_a"    ,
-        "dtos_c"    ,
-        "dtos_u_c"    ,
-        "dtos_beta" ,
-        "dtos_u_beta" ,
+        "lps_u_c"   ,
     ]
 )
 
@@ -87,57 +65,36 @@ def fit_and_plot(pulsar):
     scale_figure = 0.9
     fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(5.5*scale_figure,4*scale_figure))
 
-    pl_a      = None
-    pl_u_a      = None
-    pl_c      = None
-    pl_u_c      = None
-    bpl_vb    = None
-    bpl_u_vb    = None
-    bpl_a1    = None
-    bpl_u_a1    = None
-    bpl_a2    = None
-    bpl_u_a2    = None
-    bpl_c     = None
-    bpl_u_c     = None
-    lps_a     = None
-    lps_u_a     = None
-    lps_b     = None
-    lps_u_b     = None
-    lps_c     = None
-    lps_u_c     = None
-    lps_v_peak= None
-    lps_u_v_peak= None
-    hfco_vc   = None
-    hfco_u_vc   = None
-    hfco_a   = None
-    hfco_u_a   = None
-    hfco_c    = None
-    hfco_u_c    = None
-    lfto_vpeak   = None
-    lfto_u_vpeak   = None
-    lfto_a    = None
-    lfto_u_a    = None
-    lfto_c    = None
-    lfto_u_c    = None
-    lfto_beta = None
-    lfto_u_beta = None
-    dtos_vc   = None
-    dtos_u_vc   = None
-    dtos_vpeak   = None
-    dtos_u_vpeak   = None
-    dtos_a    = None
-    dtos_u_a    = None
-    dtos_c    = None
-    dtos_u_c    = None
-    dtos_beta = None
-    dtos_u_beta = None
+    a       = None
+    u_a     = None
+    c       = None
+    u_c     = None
+    vb      = None
+    u_vb    = None
+    a1      = None
+    u_a1    = None
+    a2      = None
+    u_a2    = None
+    vc      = None
+    u_vc    = None
+    vpeak   = None
+    u_vpeak = None
+    beta    = None
+    u_beta  = None
+    lps_a   = None
+    lps_u_a = None
+    lps_b   = None
+    lps_u_b = None
+    lps_c   = None
+    lps_u_c = None
+
 
     freq_all, flux_all, flux_err_all, ref_all = cat_dict[pulsar]
     query_id = list(query['PSRJ']).index(pulsar)
 
     models, iminuit_results, fit_infos, p_best, p_catagory = find_best_spectral_fit(
         pulsar, freq_all, flux_all, flux_err_all, ref_all,
-        plot_best=True, alternate_style=True,# axis=ax
+        plot_best=True,# axis=ax
     )
     # plt.tight_layout(pad=2.5)
     # plt.savefig(f"{pulsar}_fit.png", bbox_inches='tight', dpi=300)
@@ -148,20 +105,20 @@ def fit_and_plot(pulsar):
 
         # record model specific bits
         if models == "simple_power_law":
-            pl_a = iminuit_results.values["a"]
-            pl_u_a = iminuit_results.errors["a"]
-            pl_c = iminuit_results.values["c"]
-            pl_u_c = iminuit_results.errors["c"]
+            a = iminuit_results.values["a"]
+            u_a = iminuit_results.errors["a"]
+            c = iminuit_results.values["c"]
+            u_c = iminuit_results.errors["c"]
         elif models == "broken_power_law":
             #vb, a1, a2, b
-            bpl_vb = iminuit_results.values["vb"]
-            bpl_u_vb = iminuit_results.errors["vb"]
-            bpl_a1 = iminuit_results.values["a1"]
-            bpl_u_a1 = iminuit_results.errors["a1"]
-            bpl_a2 = iminuit_results.values["a2"]
-            bpl_u_a2 = iminuit_results.errors["a2"]
-            bpl_c = iminuit_results.values["c"]
-            bpl_u_c = iminuit_results.errors["c"]
+            vb = iminuit_results.values["vb"]
+            u_vb = iminuit_results.errors["vb"]
+            a1 = iminuit_results.values["a1"]
+            u_a1 = iminuit_results.errors["a1"]
+            a2 = iminuit_results.values["a2"]
+            u_a2 = iminuit_results.errors["a2"]
+            c = iminuit_results.values["c"]
+            u_c = iminuit_results.errors["c"]
         elif models == "log_parabolic_spectrum":
             lps_a = iminuit_results.values["a"]
             lps_u_a = iminuit_results.errors["a"]
@@ -170,7 +127,7 @@ def fit_and_plot(pulsar):
             lps_c = iminuit_results.values["c"]
             lps_u_c = iminuit_results.errors["c"]
             # Calculate the peak frequency
-            v_peak, u_v_peak = calc_log_parabolic_spectrum_max_freq(
+            vpeak, u_vpeak = calc_log_parabolic_spectrum_max_freq(
                 iminuit_results.values["a"],
                 iminuit_results.values["b"],
                 iminuit_results.values["v0"],
@@ -178,48 +135,45 @@ def fit_and_plot(pulsar):
                 iminuit_results.errors["b"],
                 iminuit_results.covariance[0][1],
             )
-            lps_v_peak = v_peak
-            lps_u_v_peak = u_v_peak
-            #print(f"vpeak: {v_peak/1e6:6.2f} +/- {u_v_peak/1e6:6.2f}")
         elif models == "high_frequency_cut_off_power_law":
-            hfco_vc = iminuit_results.values["vc"]
-            hfco_u_vc = iminuit_results.errors["vc"]
-            hfco_a = iminuit_results.values["a"]
-            hfco_u_a = iminuit_results.errors["a"]
-            hfco_c = iminuit_results.values["c"]
-            hfco_u_c = iminuit_results.errors["c"]
+            vc = iminuit_results.values["vc"]
+            u_vc = iminuit_results.errors["vc"]
+            a = iminuit_results.values["a"]
+            u_a = iminuit_results.errors["a"]
+            c = iminuit_results.values["c"]
+            u_c = iminuit_results.errors["c"]
         elif models == "low_frequency_turn_over_power_law":
             #  vc, a, b, beta
-            lfto_vpeak = iminuit_results.values["vpeak"]
-            lfto_u_vpeak = iminuit_results.errors["vpeak"]
-            lfto_a = iminuit_results.values["a"]
-            lfto_u_a = iminuit_results.errors["a"]
-            lfto_c = iminuit_results.values["c"]
-            lfto_u_c = iminuit_results.errors["c"]
-            lfto_beta = iminuit_results.values["beta"]
-            lfto_u_beta = iminuit_results.errors["beta"]
+            vpeak = iminuit_results.values["vpeak"]
+            u_vpeak = iminuit_results.errors["vpeak"]
+            a = iminuit_results.values["a"]
+            u_a = iminuit_results.errors["a"]
+            c = iminuit_results.values["c"]
+            u_c = iminuit_results.errors["c"]
+            beta = iminuit_results.values["beta"]
+            u_beta = iminuit_results.errors["beta"]
         elif models == "low_frequency_turn_over_power_law":
             #  vc, a, b, beta
-            lfto_vpeak = iminuit_results.values["vpeak"]
-            lfto_u_vpeak = iminuit_results.errors["vpeak"]
-            lfto_a = iminuit_results.values["a"]
-            lfto_u_a = iminuit_results.errors["a"]
-            lfto_c = iminuit_results.values["c"]
-            lfto_u_c = iminuit_results.errors["c"]
-            lfto_beta = iminuit_results.values["beta"]
-            lfto_u_beta = iminuit_results.errors["beta"]
+            vpeak = iminuit_results.values["vpeak"]
+            u_vpeak = iminuit_results.errors["vpeak"]
+            a = iminuit_results.values["a"]
+            u_a = iminuit_results.errors["a"]
+            c = iminuit_results.values["c"]
+            u_c = iminuit_results.errors["c"]
+            beta = iminuit_results.values["beta"]
+            u_beta = iminuit_results.errors["beta"]
         elif models == "double_turn_over_spectrum":
             #  vc, a, b, beta
-            dtos_vc = iminuit_results.values["vc"]
-            dtos_u_vc = iminuit_results.errors["vc"]
-            dtos_vpeak = iminuit_results.values["vpeak"]
-            dtos_u_vpeak = iminuit_results.errors["vpeak"]
-            dtos_a = iminuit_results.values["a"]
-            dtos_u_a = iminuit_results.errors["a"]
-            dtos_c = iminuit_results.values["c"]
-            dtos_u_c = iminuit_results.errors["c"]
-            dtos_beta = iminuit_results.values["beta"]
-            dtos_u_beta = iminuit_results.errors["beta"]
+            vc = iminuit_results.values["vc"]
+            u_vc = iminuit_results.errors["vc"]
+            vpeak = iminuit_results.values["vpeak"]
+            u_vpeak = iminuit_results.errors["vpeak"]
+            a = iminuit_results.values["a"]
+            u_a = iminuit_results.errors["a"]
+            c = iminuit_results.values["c"]
+            u_c = iminuit_results.errors["c"]
+            beta = iminuit_results.values["beta"]
+            u_beta = iminuit_results.errors["beta"]
     min_freq = min(cat_dict[pulsar][0])
     max_freq = max(cat_dict[pulsar][0])
 
@@ -236,58 +190,28 @@ def fit_and_plot(pulsar):
         "Min freq (MHz)":min_freq,
         "Max freq (MHz)":max_freq,
         "N data flux": len(flux_all),
-        "pl_a"      : pl_a     ,
-        "pl_u_a"      : pl_u_a     ,
-        "pl_c"      : pl_c     ,
-        "pl_u_c"      : pl_u_c     ,
-        "bpl_vb"    : bpl_vb   ,
-        "bpl_u_vb"    : bpl_u_vb   ,
-        "bpl_a1"    : bpl_a1   ,
-        "bpl_u_a1"    : bpl_u_a1   ,
-        "bpl_a2"    : bpl_a2   ,
-        "bpl_u_a2"    : bpl_u_a2   ,
-        "bpl_c"     : bpl_c    ,
-        "bpl_u_c"     : bpl_u_c    ,
-        "lps_a"     : lps_a    ,
-        "lps_u_a"     : lps_u_a    ,
-        "lps_b"     : lps_b    ,
-        "lps_u_b"     : lps_u_b    ,
-        "lps_c"     : lps_c    ,
-        "lps_u_c"     : lps_u_c    ,
-        "lps_v_peak": lps_v_peak,
-        "lps_u_v_peak": lps_u_v_peak,
-        "hfco_vc"   : hfco_vc  ,
-        "hfco_u_vc"   : hfco_u_vc  ,
-        "hfco_a"   : hfco_a  ,
-        "hfco_u_a"   : hfco_u_a  ,
-        "hfco_c"    : hfco_c   ,
-        "hfco_u_c"    : hfco_u_c   ,
-        "lfto_vpeak"   : lfto_vpeak  ,
-        "lfto_u_vpeak" : lfto_u_vpeak,
-        "lfto_a"    : lfto_a   ,
-        "lfto_u_a"    : lfto_u_a   ,
-        "lfto_c"    : lfto_c   ,
-        "lfto_u_c"    : lfto_u_c   ,
-        "lfto_beta" : lfto_beta,
-        "lfto_u_beta" : lfto_u_beta,
-        "lfto_vpeak"   : lfto_vpeak  ,
-        "lfto_u_vpeak" : lfto_u_vpeak,
-        "lfto_a"    : lfto_a   ,
-        "lfto_u_a"    : lfto_u_a   ,
-        "lfto_c"    : lfto_c   ,
-        "lfto_u_c"    : lfto_u_c   ,
-        "lfto_beta" : lfto_beta,
-        "lfto_u_beta" : lfto_u_beta,
-        "dtos_vc"   : dtos_vc  ,
-        "dtos_u_vc"   : dtos_u_vc  ,
-        "dtos_vpeak"   : dtos_vpeak  ,
-        "dtos_u_vpeak" : dtos_u_vpeak,
-        "dtos_a"    : dtos_a   ,
-        "dtos_u_a"    : dtos_u_a   ,
-        "dtos_c"    : dtos_c   ,
-        "dtos_u_c"    : dtos_u_c   ,
-        "dtos_beta" : dtos_beta,
-        "dtos_u_beta" : dtos_u_beta,
+        "a"       : a,
+        "u_a"     : u_a,
+        "c"       : c,
+        "u_c"     : u_c,
+        "vb"      : vb,
+        "u_vb"    : u_vb,
+        "a1"      : a1,
+        "u_a1"    : u_a1,
+        "a2"      : a2,
+        "u_a2"    : u_a2,
+        "vc"      : vc,
+        "u_vc"    : u_vc,
+        "vpeak"   : vpeak,
+        "u_vpeak" : u_vpeak,
+        "beta"    : beta,
+        "u_beta"  : u_beta,
+        "lps_a"     : lps_a,
+        "lps_u_a"   : lps_u_a,
+        "lps_b"     : lps_b,
+        "lps_u_b"   : lps_u_b,
+        "lps_c"     : lps_c,
+        "lps_u_c"   : lps_u_c,
     }
     #, ignore_index=True)
 
