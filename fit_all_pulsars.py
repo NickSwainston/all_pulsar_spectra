@@ -55,6 +55,7 @@ output_df = pd.DataFrame(
         "lps_u_b"   ,
         "lps_c"     ,
         "lps_u_c"   ,
+        "SMART",
     ]
 )
 
@@ -90,6 +91,11 @@ def fit_and_plot(pulsar):
 
     freq_all, flux_all, flux_err_all, ref_all = cat_dict[pulsar]
     query_id = list(query['PSRJ']).index(pulsar)
+
+    if 'Bhat_2022' in ref_all:
+        smart_pulsar = True
+    else:
+        smart_pulsar = False
 
     models, iminuit_results, fit_infos, p_best, p_catagory = find_best_spectral_fit(
         pulsar, freq_all, flux_all, flux_err_all, ref_all,
@@ -211,6 +217,7 @@ def fit_and_plot(pulsar):
         "lps_u_b"   : lps_u_b,
         "lps_c"     : lps_c,
         "lps_u_c"   : lps_u_c,
+        "SMART":smart_pulsar,
     }
     #, ignore_index=True)
 

@@ -14,6 +14,7 @@ hfto_df = df[df["Model"] == "high_frequency_cut_off_power_law"]
 lfto_df = df[df["Model"] == "low_frequency_turn_over_power_law"]
 dtos_df = df[df["Model"] == "double_turn_over_spectrum"]
 nomod_df = df[df["Model"] == ""]
+smart_df = df[df["SMART"]]
 
 if len(lps_df) == 0:
     del df["lps_a"]
@@ -41,6 +42,7 @@ Pulsar Spectra all pulsars fit results
    lfto_gallery
    hfco_gallery
    dtos_gallery
+   smart_gallery
 
 
 Fit Summary
@@ -242,6 +244,25 @@ Double Turn Over Spectrum Gallery
 
 ''')
     for index, row in dtos_df.iterrows():
+        file.write(f'''
+
+.. _{row["Pulsar"]}:
+
+{row["Pulsar"]}
+{"-"*len(row["Pulsar"])}
+.. image:: best_fits/{row["Pulsar"]}_fit.png
+  :width: 800
+''')
+
+with open(f'{os.path.dirname(os.path.realpath(__file__))}/docs/smart_gallery.rst', 'w') as file:
+    file.write(f'''
+SMART Gallery
+=============
+
+All pulsar detections from the SMART pulsar survey (these will be in other galleries).
+
+''')
+    for index, row in smart_df.iterrows():
         file.write(f'''
 
 .. _{row["Pulsar"]}:
