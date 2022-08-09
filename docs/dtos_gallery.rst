@@ -4,6 +4,14 @@ Double Turn Over Spectrum Gallery
 
 
 
+.. _J1136+1551:
+
+J1136+1551
+----------
+.. image:: best_fits/J1136+1551_fit.png
+  :width: 800
+
+
 .. _J1607-0032:
 
 J1607-0032
@@ -12,17 +20,9 @@ J1607-0032
   :width: 800
 
 
-.. _J1832-1021:
+.. _J2113+2754:
 
-J1832-1021
+J2113+2754
 ----------
-.. image:: best_fits/J1832-1021_fit.png
-  :width: 800
-
-
-.. _J1852-0635:
-
-J1852-0635
-----------
-.. image:: best_fits/J1852-0635_fit.png
+.. image:: best_fits/J2113+2754_fit.png
   :width: 800
