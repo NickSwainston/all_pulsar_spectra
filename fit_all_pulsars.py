@@ -14,7 +14,7 @@ from pulsar_spectra.analysis import calc_log_parabolic_spectrum_max_freq
 
 smart_pulsars = ['J0030+0451', 'J0034-0534', 'J0034-0721', 'J0038-2501', 'J0051+0423', 'J0133-6957', 'J0134-2937', 'J0151-0635', 'J0152-1637', 'J0206-4028', 'J0255-5304', 'J0304+1932', 'J0401-7608', 'J0418-4154', 'J0437-4715', 'J0450-1248', 'J0452-1759', 'J0459-0210', 'J0514-4408', 'J0520-2553', 'J0525+1115', 'J0528+2200', 'J0534+2200', 'J0600-5756', 'J0601-0527', 'J0614+2229', 'J0624-0424', 'J0630-2834', 'J0636-4549', 'J0702-4956', 'J0729-1448', 'J0729-1836', 'J0737-3039A', 'J0742-2822', 'J0749-4247', 'J0758-1528', 'J0820-1350', 'J0820-3921', 'J0820-4114', 'J0823+0159', 'J0826+2637', 'J0835-4510', 'J0837+0610', 'J0837-4135', 'J0838-3947', 'J0842-4851', 'J0855-3331', 'J0856-6137', 'J0902-6325', 'J0904-7459', 'J0905-6019', 'J0907-5157', 'J0908-1739', 'J0922+0638', 'J0924-5302', 'J0924-5814', 'J0942-5552', 'J0942-5657', 'J0943+1631', 'J0944-1354', 'J0946+0951', 'J0953+0755', 'J0955-5304', 'J0959-4809', 'J1003-4747', 'J1012-2337', 'J1018-1642', 'J1022+1001', 'J1034-3224', 'J1041-1942', 'J1057-5226', 'J1059-5742', 'J1112-6926', 'J1116-4122', 'J1121-5444', 'J1123-4844', 'J1123-6651', 'J1136+1551', 'J1136-5525', 'J1141-6545', 'J1146-6030', 'J1202-5820', 'J1224-6407', 'J1225-5556', 'J1239-6832', 'J1240-4124', 'J1257-1027', 'J1300+1240', 'J1311-1228', 'J1312-5402', 'J1313+0931', 'J1320-5359', 'J1328-4357', 'J1332-3032', 'J1335-3642', 'J1340-6456', 'J1355-5153', 'J1418-3921', 'J1430-6623', 'J1440-6344', 'J1453-6413', 'J1455-3330', 'J1456-6843', 'J1507-4352', 'J1510-4422', 'J1527-3931', 'J1534-5334', 'J1536-4948', 'J1543+0929', 'J1543-0620', 'J2048-1616', 'J2108-3429', 'J2145-0750', 'J2155-3118', 'J2222-0137', 'J2234+2114', 'J2241-5236', 'J2248-0101', 'J2317+2149', 'J2324-6054', 'J2325-0530', 'J2330-2005', 'J2336-01', 'J2354-22']
 
-cat_dict = collect_catalogue_fluxes()
+cat_dict = collect_catalogue_fluxes(exclude=["Taylor_1993", "Sieber_1973"])
 query = psrqpy.QueryATNF().pandas
 
 results_record = []
@@ -33,6 +33,7 @@ output_df = pd.DataFrame(
         "N data flux",
         "Min freq (MHz)",
         "Max freq (MHz)",
+        "Bandwidth fit?",
         "a"         ,
         "u_a"       ,
         "c"         ,
@@ -89,7 +90,7 @@ def fit_and_plot(pulsar):
     lps_u_c = None
 
 
-    freq_all, flux_all, flux_err_all, ref_all = cat_dict[pulsar]
+    freq_all, bands_all, flux_all, flux_err_all, ref_all = cat_dict[pulsar]
     query_id = list(query['PSRJ']).index(pulsar)
 
     if 'Bhat_2022' in ref_all:
@@ -97,8 +98,9 @@ def fit_and_plot(pulsar):
     else:
         smart_pulsar = False
 
-    models, iminuit_results, fit_infos, p_best, p_catagory = find_best_spectral_fit(
-        pulsar, freq_all, flux_all, flux_err_all, ref_all,
+    print(pulsar)
+    models, iminuit_results, fit_infos, p_best, band_bool = find_best_spectral_fit(
+        pulsar, freq_all, bands_all, flux_all, flux_err_all, ref_all,
         plot_best=True,# axis=ax
     )
     # plt.tight_layout(pad=2.5)
@@ -195,6 +197,7 @@ def fit_and_plot(pulsar):
         "Min freq (MHz)":min_freq,
         "Max freq (MHz)":max_freq,
         "N data flux": len(flux_all),
+        "Bandwidth fit?": band_bool,
         "a"       : a,
         "u_a"     : u_a,
         "c"       : c,
@@ -231,7 +234,10 @@ for pulsar in cat_dict.keys():
         continue
     pulsars_to_process.append(pulsar)
 #pulsars_to_process = ['J0034-0534', 'J0835-4510', 'J1141-6545', 'J1751-4657', 'J0953+0755']
-#pulsars_to_process = ['J0828-3417']
+# pulsars_to_process = ['J1136+1551']
+# Pulsars with large bandwidths
+#pulsars_to_process = ['J1721-3532', 'J1048-5832', 'J0908-4913', 'J1644-4559', 'J1740-3015', 'J0738-4042', 'J0437-4715', 'J1935+1616', 'J2048-1616', 'J2321+6024', 'J1622-4950', 'J0358+5413', 'J2022+5154', 'J1752-2806', 'J2022+2854', 'J1645-0317', 'J1709-1640', 'J0528+2200', 'J0332+5434', 'J2018+2839', 'J0814+7429', 'J0826+2637', 'J0953+0755', 'J1136+1551', 'J1239+2453', 'J1932+1059', 'J1745-2900', 'J0835-4510']
+#pulsars_to_process = ["J2354+6155"]
 
 pbar = tqdm(pulsars_to_process)
 # freeze params/function as object
@@ -241,14 +247,19 @@ p = mp.Pool(8)
 # runs mp with params on pbar
 #results = p.imap(fc_, pbar)
 results = list(p.imap(fc_, pbar))
+print("done")
 #print(results)
 # close out and join processes
 p.close()
+print("closed")
 p.join()
+print("joined")
 
 # results = []
 # for pulsar in pulsars_to_process:
 #     results.append(fit_and_plot(pulsar))
 
 df = pd.DataFrame(results)
+print('start dump')
 df.to_csv('all_pulsar_fits.csv', index=False)
+print('dumped')
