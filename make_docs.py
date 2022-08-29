@@ -6,6 +6,7 @@ import seaborn as sns
 from scipy import stats
 import math
 from sympy import sec
+from jacobi import propagate
 
 from iminuit import Minuit
 from iminuit.cost import LeastSquares
@@ -361,55 +362,73 @@ def yline(x, g, xmean, ymean):
 def xline(y, g, ymean, xmean):
     return xmean + g * (y - ymean)
 
-def line_fit(data_x, data_y, data_yerr, xcol, ycol, lax):
+def line_fit(data_x, data_y, data_yerr, xcol, ycol, lax, weighted_corr):
     xmean=np.mean(data_x)
     ymean=np.mean(data_y)
 
     # fit y line
     least_squares = LeastSquares(data_x, data_y, data_yerr, yline)
-    my = Minuit(least_squares, g=0, xmean=xmean, ymean=ymean)  # starting values for α and β
-    my.fixed["xmean"] = True
-    my.fixed["ymean"] = True
-    my.migrad()  # finds minimum of least_squares function
-    my.hesse()   # accurately computes uncertaintiesax):
+    m = Minuit(least_squares, g=0, xmean=xmean, ymean=ymean)  # starting values for α and β
+    # m.fixed["xmean"] = True
+    # m.fixed["ymean"] = True
+    m.migrad()  # finds minimum of least_squares function
+    m.hesse()   # accurately computes uncertaintiesax):
 
-    # fit x line
-    least_squares = LeastSquares(data_y, data_x, data_x*0.001, xline)
-    mx = Minuit(least_squares, g=0, xmean=xmean, ymean=ymean)  # starting values for α and β
-    mx.fixed["xmean"] = True
-    mx.fixed["ymean"] = True
-    mx.migrad()  # finds minimum of least_squares function
-    mx.hesse()   # accurately computes uncertainties
+    # # fit x line
+    # least_squares = LeastSquares(data_y, data_x, data_x*0.001, xline)
+    # mx = Minuit(least_squares, g=0, xmean=xmean, ymean=ymean)  # starting values for α and β
+    # mx.fixed["xmean"] = True
+    # mx.fixed["ymean"] = True
+    # mx.migrad()  # finds minimum of least_squares function
+    # mx.hesse()   # accurately computes uncertainties
 
-    m1 = my.values["g"]
-    m2 = mx.values["g"]
+    # m1 = my.values["g"]
+    # m2 = mx.values["g"]
 
-    delta = math.atan( (m1 - m2) / (1 + m1 * m2) )
-    #print(delta)
+    # # Delta from the difference between regression lines
+    # delta = math.atan( (m1 - m2) / (1 + m1 * m2) )
+
+    # Delta from fot product
+    delta = math.acos( np.dot(data_x, data_y) / ( np.linalg.norm(data_x) * np.linalg.norm(data_y) ) )
+    print(delta)
     #r = float(sec(delta) - math.tan(delta))
     r = (1 - np.sqrt(1 - np.cos(delta))) / np.cos(delta)
-    if m1 < 0 or m2 < 0:
-        r = -r
     #print(r)
 
-
+    capsize = 1.5
+    errorbar_linewidth = 0.7
+    marker_border_thickness = 0.5
     # draw data and fitted line
     f, ax = plt.subplots()
     ax.errorbar( data_x, data_y, data_yerr, fmt="o", label="data")
-    lax.errorbar(data_x, data_y, data_yerr, fmt="o", label="data")
-    ax.plot( data_x, yline(data_x, r, xmean, ymean), label="fit")
-    lax.plot(data_x, yline(data_x, r, xmean, ymean), label="fit")
-    lax.plot(data_x, yline(data_x, m1, xmean, ymean), label="fit")
-    lax.plot(data_x, yline(data_x, m2, xmean, ymean), label="fit")
+    (_, caps, _) = lax.errorbar(data_x, data_y, data_yerr, fmt="o", label="data",
+        markeredgewidth=marker_border_thickness,
+        elinewidth=errorbar_linewidth,
+        capsize=capsize,
+        markersize=3,
+    )
+    for cap in caps:
+        cap.set_markeredgewidth(errorbar_linewidth)
+
+    # plot fit line and error bar
+    fitted_line, fitted_line_cov = propagate(lambda p: yline(data_x, *p), m.values, m.covariance)
+    fitted_line_err = np.diag(fitted_line_cov) ** 0.5
+    ax.plot( data_x, fitted_line, label="fit")
+    lax.plot(data_x, fitted_line, label="fit")
+    ax.fill_between( data_x, fitted_line - fitted_line_err, fitted_line + fitted_line_err, facecolor="C1", alpha=0.5)
+    lax.fill_between(data_x, fitted_line - fitted_line_err, fitted_line + fitted_line_err, facecolor="C1", alpha=0.5)
+    # print(fitted_line)
+    # print(fitted_line_err)
 
     # Labels
     ax.set_xlabel(xcol)
     lax.set_xlabel(xcol)
     ax.set_ylabel(ycol)
     lax.set_ylabel(ycol)
+    ax.legend( title=f"Corr={weighted_corr:.3f}")
+    lax.legend(title=f"Corr={weighted_corr:.3f}")
 
-
-    # display legend with some fit info
+    # # display legend with some fit info
     # fit_info = [
     #     f"$\\chi^2$ / $n_\\mathrm{{dof}}$ = {m.fval:.1f} / {len(data_x) - m.nfit}",
     # ]
@@ -461,14 +480,15 @@ for xa, xcol in enumerate(xcols):
         print(f"-------------------------------------------------")
         print(f"pandas:        {corr_matrix[xcol][ycol]:6.3f}")
         print(f"numpy:         {np.corrcoef(x,y)[0][1]:6.3f}")
+        weighted_corr = weighted_correlation(x, y ,yerr)
         print(f"weighted corr: {weighted_correlation(x, y ,yerr):6.3f}")
         rho, pval = stats.spearmanr(x, y, nan_policy="omit")
         print(f"spearmanr:     {rho:6.3f}")
 
-        weighted_line_corr = line_fit(x, y, yerr, xcol, ycol, laxes[ya][xa])
+        weighted_line_corr = line_fit(x, y, yerr, xcol, ycol, laxes[ya][xa], weighted_corr)
         print(f"line:          {weighted_line_corr:6.3f}")
 
         sns.regplot(data=log_df, x=xcol, y=ycol, ax=saxes[ya][xa])
 
-sfig.savefig(f'coor_all.png')
-lfig.savefig(f'corr_all_weighted.png')
+sfig.savefig(f'coor_all.png', dpi=300)
+lfig.savefig(f'corr_all_weighted.png', dpi=300)
