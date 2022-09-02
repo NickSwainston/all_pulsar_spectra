@@ -4,43 +4,19 @@ Double Turn Over Spectrum Gallery
 
 
 
-.. _J0034-0721:
+.. _J0452-1759:
 
-J0034-0721
+J0452-1759
 ----------
-.. image:: best_fits/J0034-0721_fit.png
+.. image:: best_fits/J0452-1759_fit.png
   :width: 800
 
 
-.. _J0828-3417:
+.. _J0953+0755:
 
-J0828-3417
+J0953+0755
 ----------
-.. image:: best_fits/J0828-3417_fit.png
-  :width: 800
-
-
-.. _J0835-4510:
-
-J0835-4510
-----------
-.. image:: best_fits/J0835-4510_fit.png
-  :width: 800
-
-
-.. _J0946+0951:
-
-J0946+0951
-----------
-.. image:: best_fits/J0946+0951_fit.png
-  :width: 800
-
-
-.. _J1456-6843:
-
-J1456-6843
-----------
-.. image:: best_fits/J1456-6843_fit.png
+.. image:: best_fits/J0953+0755_fit.png
   :width: 800
 
 
@@ -52,33 +28,25 @@ J1644-4559
   :width: 800
 
 
-.. _J1731-4744:
+.. _J1820-0427:
 
-J1731-4744
+J1820-0427
 ----------
-.. image:: best_fits/J1731-4744_fit.png
+.. image:: best_fits/J1820-0427_fit.png
   :width: 800
 
 
-.. _J2145-0750:
+.. _J1932+1059:
 
-J2145-0750
+J1932+1059
 ----------
-.. image:: best_fits/J2145-0750_fit.png
+.. image:: best_fits/J1932+1059_fit.png
   :width: 800
 
 
-.. _J2313+4253:
+.. _J2330-2005:
 
-J2313+4253
+J2330-2005
 ----------
-.. image:: best_fits/J2313+4253_fit.png
-  :width: 800
-
-
-.. _J2317+2149:
-
-J2317+2149
-----------
-.. image:: best_fits/J2317+2149_fit.png
+.. image:: best_fits/J2330-2005_fit.png
   :width: 800

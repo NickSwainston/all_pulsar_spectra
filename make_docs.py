@@ -1,6 +1,7 @@
 import pandas as pd
 import os
 import matplotlib.pyplot as plt
+from matplotlib.ticker import FormatStrFormatter, FuncFormatter
 import numpy as np
 import seaborn as sns
 from scipy import stats
@@ -319,7 +320,7 @@ plt.clf()
 log_df = df[df["beta"] < 2.05]
 # convert to log data
 for col_name in log_df.keys():
-    if "ATNF" in col_name:
+    if "ATNF" in col_name or col_name in ("L400 (mJy kpc^2)", "L1400 (mJy kpc^2)", "Age (Yr)"):
         log_df[col_name + " log"] = np.log10(log_df[col_name])
         del log_df[col_name]
     elif col_name.startswith("v"):
@@ -369,8 +370,8 @@ def line_fit(data_x, data_y, data_yerr, xcol, ycol, lax, weighted_corr):
     # fit y line
     least_squares = LeastSquares(data_x, data_y, data_yerr, yline)
     m = Minuit(least_squares, g=0, xmean=xmean, ymean=ymean)  # starting values for α and β
-    # m.fixed["xmean"] = True
-    # m.fixed["ymean"] = True
+    m.fixed["xmean"] = True
+    m.fixed["ymean"] = True
     m.migrad()  # finds minimum of least_squares function
     m.hesse()   # accurately computes uncertaintiesax):
 
@@ -390,7 +391,7 @@ def line_fit(data_x, data_y, data_yerr, xcol, ycol, lax, weighted_corr):
 
     # Delta from fot product
     delta = math.acos( np.dot(data_x, data_y) / ( np.linalg.norm(data_x) * np.linalg.norm(data_y) ) )
-    print(delta)
+    # print(delta)
     #r = float(sec(delta) - math.tan(delta))
     r = (1 - np.sqrt(1 - np.cos(delta))) / np.cos(delta)
     #print(r)
@@ -412,7 +413,8 @@ def line_fit(data_x, data_y, data_yerr, xcol, ycol, lax, weighted_corr):
 
     # plot fit line and error bar
     fitted_line, fitted_line_cov = propagate(lambda p: yline(data_x, *p), m.values, m.covariance)
-    fitted_line_err = np.diag(fitted_line_cov) ** 0.5
+    fitted_line_err = abs(np.diag(fitted_line_cov) ** 0.5)
+    print(f"error percent: {np.mean(fitted_line_err/fitted_line)}")
     ax.plot( data_x, fitted_line, label="fit")
     lax.plot(data_x, fitted_line, label="fit")
     ax.fill_between( data_x, fitted_line - fitted_line_err, fitted_line + fitted_line_err, facecolor="C1", alpha=0.5)
@@ -427,6 +429,26 @@ def line_fit(data_x, data_y, data_yerr, xcol, ycol, lax, weighted_corr):
     lax.set_ylabel(ycol)
     ax.legend( title=f"Corr={weighted_corr:.3f}")
     lax.legend(title=f"Corr={weighted_corr:.3f}")
+    if 'log' in xcol:
+        ax.xaxis.set_major_formatter(
+            FuncFormatter(lambda x, p:
+                '$\mathdefault{10^{%i}}$' % x))
+        lax.xaxis.set_major_formatter(
+            FuncFormatter(lambda x, p:
+                '$\mathdefault{10^{%i}}$' % x))
+        # ax.get_xaxis().set_major_formatter(FormatStrFormatter('%g'))
+        # lax.get_xaxis().set_major_formatter(FormatStrFormatter('%g'))
+    if 'log' in ycol:
+        ax.yaxis.set_major_formatter(
+            FuncFormatter(lambda x, p:
+                '$\mathdefault{10^{%i}}$' % x))
+        lax.yaxis.set_major_formatter(
+            FuncFormatter(lambda x, p:
+                '$\mathdefault{10^{%i}}$' % x))
+        ax.get_yaxis().set_major_formatter(FormatStrFormatter('%g'))
+        lax.get_yaxis().set_major_formatter(FormatStrFormatter('%g'))
+    ax.tick_params(which='both', direction='in', top=1, right=1)
+    lax.tick_params(which='both', direction='in', top=1, right=1)
 
     # # display legend with some fit info
     # fit_info = [
@@ -449,6 +471,9 @@ xcols = [
     "ATNF DM log",
     "ATNF B_surf (G) log",
     "ATNF E_dot (ergs/s) log",
+    "L400 (mJy kpc^2) log",
+    "L1400 (mJy kpc^2) log",
+    "Age (Yr) log",
 ]
 ycols = [
         "a"         ,
@@ -460,8 +485,10 @@ ycols = [
         "vpeak log"     ,
         "beta"      ,
 ]
-sfig, saxes = plt.subplots(4, 4, figsize=(20, 20))
-lfig, laxes = plt.subplots(4, 4, figsize=(20, 20))
+nx = len(xcols)
+ny = len(ycols)
+sfig, saxes = plt.subplots(ny, nx, figsize=(5*nx, 5*ny))
+lfig, laxes = plt.subplots(ny, nx, figsize=(5*nx, 5*ny))
 corr_matrix = log_df.corr()
 for xa, xcol in enumerate(xcols):
     for ya, ycol in enumerate(ycols):
@@ -469,7 +496,7 @@ for xa, xcol in enumerate(xcols):
         y = []
         yerr = []
         for xi, yi, yerri in zip(list(log_df[xcol]), list(log_df[ycol]), list(log_df["u_"+ycol])):
-            if (not np.isnan(xi)) and ( not np.isnan(yi) ) and ( not np.isnan(yerri) ):
+            if (not np.isnan(xi)) and ( not np.isnan(yi) ) and ( not np.isnan(yerri) ) and (not np.isinf(xi)):
                 x.append(xi)
                 y.append(yi)
                 yerr.append(yerri)
