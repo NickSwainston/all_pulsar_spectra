@@ -4,49 +4,137 @@ Double Turn Over Spectrum Gallery
 
 
 
-.. _J0452-1759:
+.. _J0024-7204D:
 
-J0452-1759
-----------
-.. image:: best_fits/J0452-1759_fit.png
+J0024-7204D
+-----------
+.. image:: best_fits/J0024-7204D_fit.png
   :width: 800
 
 
-.. _J0953+0755:
+.. _J0034-0534:
 
-J0953+0755
+J0034-0534
 ----------
-.. image:: best_fits/J0953+0755_fit.png
+.. image:: best_fits/J0034-0534_fit.png
   :width: 800
 
 
-.. _J1644-4559:
+.. _J0034-0721:
 
-J1644-4559
+J0034-0721
 ----------
-.. image:: best_fits/J1644-4559_fit.png
+.. image:: best_fits/J0034-0721_fit.png
   :width: 800
 
 
-.. _J1820-0427:
+.. _J0613-0200:
 
-J1820-0427
+J0613-0200
 ----------
-.. image:: best_fits/J1820-0427_fit.png
+.. image:: best_fits/J0613-0200_fit.png
   :width: 800
 
 
-.. _J1932+1059:
+.. _J0630-2834:
 
-J1932+1059
+J0630-2834
 ----------
-.. image:: best_fits/J1932+1059_fit.png
+.. image:: best_fits/J0630-2834_fit.png
   :width: 800
 
 
-.. _J2330-2005:
+.. _J0837+0610:
 
-J2330-2005
+J0837+0610
 ----------
-.. image:: best_fits/J2330-2005_fit.png
+.. image:: best_fits/J0837+0610_fit.png
+  :width: 800
+
+
+.. _J0946+0951:
+
+J0946+0951
+----------
+.. image:: best_fits/J0946+0951_fit.png
+  :width: 800
+
+
+.. _J1022+1001:
+
+J1022+1001
+----------
+.. image:: best_fits/J1022+1001_fit.png
+  :width: 800
+
+
+.. _J1543+0929:
+
+J1543+0929
+----------
+.. image:: best_fits/J1543+0929_fit.png
+  :width: 800
+
+
+.. _J1543-0620:
+
+J1543-0620
+----------
+.. image:: best_fits/J1543-0620_fit.png
+  :width: 800
+
+
+.. _J1559-4438:
+
+J1559-4438
+----------
+.. image:: best_fits/J1559-4438_fit.png
+  :width: 800
+
+
+.. _J1607-0032:
+
+J1607-0032
+----------
+.. image:: best_fits/J1607-0032_fit.png
+  :width: 800
+
+
+.. _J1741-3016:
+
+J1741-3016
+----------
+.. image:: best_fits/J1741-3016_fit.png
+  :width: 800
+
+
+.. _J1744-1134:
+
+J1744-1134
+----------
+.. image:: best_fits/J1744-1134_fit.png
+  :width: 800
+
+
+.. _J1752-2806:
+
+J1752-2806
+----------
+.. image:: best_fits/J1752-2806_fit.png
+  :width: 800
+
+
+.. _J1939+2134:
+
+J1939+2134
+----------
+.. image:: best_fits/J1939+2134_fit.png
+  :width: 800
+
+
+.. _J2145-0750:
+
+J2145-0750
+----------
+.. image:: best_fits/J2145-0750_fit.png
   :width: 800
