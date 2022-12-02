@@ -41,6 +41,7 @@ print(len(sync_df))
 thermal_df = all_to_df[all_to_df["beta"] >= 2.05]
 print(len(thermal_df))
 print(list(df[df["u_vc"]/df["vc"] > 3]["Pulsar"]))
+print(len(spl_df[spl_df["a"] > -1.2]) / len(spl_df))
 
 msp_cutoff = 0.03 # seconds
 
@@ -467,7 +468,6 @@ make_histogram_plots(all_indexs, hist_range, label=["hfto", "dtos"], titles=titl
 # just high frequency
 fig, ax = plt.subplots()
 ax.hist(np.log10(hfto_df["vc"]), 20, histtype='bar', color='blue')
-ax.set_title("vc histogram")
 # ax.set_xscale('log')
 # ax.xaxis.set_major_formatter(FormatStrFormatter('%g'))
 ax.xaxis.set_major_formatter(
@@ -476,7 +476,7 @@ ax.xaxis.set_major_formatter(
         f'{10**x/1e9:.1f}'
     )
 )
-ax.set_xlabel(f"$\\nu_c \mathrm{{(GHz)}}$")
+ax.set_xlabel(f"High-frequency cut off frequency (GHz)")
 ax.set_ylabel(f"#")
 fig.tight_layout()
 fig.savefig("vc_histogram_just_hfto.png")
@@ -692,38 +692,42 @@ def line_fit(
     np_raw_y     = np.array(np_raw_y)
     np_raw_yerr  = np.array(np_raw_yerr)
     if "v" in ycol:
-        # Convert to MHz
+        # Convert to GHz
         # y    /= 10**6
         # yerr /= 10**6
-        raw_y    /= 10**6
-        raw_yerr /= 10**6
-        msp_y    /= 10**6
-        msp_yerr /= 10**6
-        np_y     /= 10**6
-        np_yerr  /= 10**6
-        msp_raw_y    /= 10**6
-        msp_raw_yerr /= 10**6
-        np_raw_y     /= 10**6
-        np_raw_yerr  /= 10**6
+        raw_y        /= 10**9
+        raw_yerr     /= 10**9
+        msp_y        /= 10**9
+        msp_yerr     /= 10**9
+        np_y         /= 10**9
+        np_yerr      /= 10**9
+        msp_raw_y    /= 10**9
+        msp_raw_yerr /= 10**9
+        np_raw_y     /= 10**9
+        np_raw_yerr  /= 10**9
     if "Age" in xcol:
         # Convert to Myr
         # y    /= 10**6
         # yerr /= 10**6
-        raw_x    /= 10**6
-        msp_x    /= 10**6
-        np_x     /= 10**6
-        msp_raw_x    /= 10**6
-        np_raw_x     /= 10**6
+        raw_x     /= 10**6
+        msp_x     /= 10**6
+        np_x      /= 10**6
+        msp_raw_x /= 10**6
+        np_raw_x  /= 10**6
     # print(f"\nCorrelations of x: {xcol} and y: {ycol}. N: {len(x)}")
     # print(f"-------------------------------------------------")
     # print(f"pandas:        {corr_matrix[xcol][ycol]:6.3f}")
     # print(f"numpy:         {np.corrcoef(x,y)[0][1]:6.3f}")
     # weighted_corr = weighted_correlation(x, y ,yerr)
     rho, pval, lo, hi = spearmanr_ci(x, y)
-    if abs(rho) >= 0.4 and pval < 0.01:
+    if abs(rho) >= 0.4 and pval < 0.01/105:
         weights_str = f"{{\\bf {rho:.2f}}} ({pval:.1e}, {len(x)})"
     else:
         weights_str = f"{rho:.2f} ({pval:.1e}, {len(x)})"
+    # if abs(rho) >= 0.4 and pval < 0.01/105:
+    #     weights_str = f"{{\\bf \Large {rho:.2f}}}"
+    # else:
+    #     weights_str = f"{rho:.2f}"
     # print(f"weighted corr: {weighted_correlation(x, y ,yerr):6.3f}")
     # print(f"spearmanr:     {rho:6.3f}")
 
@@ -862,9 +866,9 @@ def line_fit(
         if ycol == "vc log" and xcol == "ATNF Spin Frequency (Hz) log":
             # Display a theory line
             fit_x = np.logspace(np.log10(min(raw_x)), np.log10(max(raw_x)))
-            fit_y    = 1.4*10**9 * (fit_x)**0.46 / 10**6
-            fit_y_lu = 1.4*10**9 * (fit_x)**0.28 / 10**6
-            fit_y_hu = 1.4*10**9 * (fit_x)**0.64 / 10**6
+            fit_y    = 1.4*10**9 * (fit_x)**0.46 / 10**9
+            fit_y_lu = 1.4*10**9 * (fit_x)**0.28 / 10**9
+            fit_y_hu = 1.4*10**9 * (fit_x)**0.64 / 10**9
             #print(fit_y)
             # fit_y = fit_y / max(fit_y) * max(raw_y)
             # print(fit_y)
@@ -923,8 +927,8 @@ def line_fit(
             # lax.get_xaxis().set_major_formatter(FormatStrFormatter('%g'))
             ax.xaxis.set_major_formatter(
                 FuncFormatter(lambda x, p:
-                    '$\mathdefault{10^{%i}}$' % x
-                    if x > 1e5 else
+                    # '$\mathdefault{10^{%i}}$' % x
+                    # if x > 1e5 else
                     '%g' % x
                 )
             )
@@ -965,7 +969,7 @@ def line_fit(
         #     fit_info.append(f"{p} = ${v:.3f} \\pm {e:.3f}$")
 
         # f.legend(title="\n".join(fit_info))
-        ax.set_title(f"{label}")
+        #ax.set_title(f"{label}")
         f.tight_layout()
         f.savefig(f'corr_plots/corr_line_{ycol}_{xcol.replace("/", "_")}_{label}.png'.replace(" ", "_"), dpi=300)
         plt.close(f)
@@ -1003,8 +1007,8 @@ ycols = [
 math_names_x = {
     "ATNF Period (s) log": "P (s)",
     "ATNF Pdot log": "$\dot{P}$ (s s$^{-1}$)",
-    "ATNF Spin Frequency (Hz) log": "$\\tilde{\\nu}$ (Hz)",
-    "ATNF Fdot log": "$\left| \dot{\\tilde{\\nu}} \\right|$ (Hz)",
+    "ATNF Spin Frequency (Hz) log": "$\\tilde{\\nu}$ (GHz)",
+    "ATNF Fdot log": "$\left| \dot{\\tilde{\\nu}} \\right|$ ",
     "ATNF DM log": "DM (pc cm$^{-3}$)",
     "ATNF B_surf (G) log": "$B_{surf}$ (G)",
     "ATNF B_LC (G) log": "$B_{LC}$ (G)",
@@ -1015,8 +1019,8 @@ math_names_x = {
 }
 math_names_y = {
         "a": "$\\alpha$",
-        "vpeak log": "$\\nu_{peak}$ (MHz)",
-        "vc log": "$\\nu_{c}$ (MHz)",
+        "vpeak log": "$\\nu_{peak}$ (GHz)",
+        "vc log": "$\\nu_c$ (GHz)",
 }
 nx = len(xcols)
 ny = len(ycols)
@@ -1041,12 +1045,13 @@ for ya, ycol in enumerate(ycols):
     nslow     = len(ycol_df[ycol_df["ATNF Period (s)"] >= msp_cutoff])
     print("")
     print("\\\\")
-    print(f"\multicolumn{{6}}{{c}}{{ ${math_names_y[ycol]}$ Correlation Coefficient }} \\\\")
+    print(f"\multicolumn{{6}}{{c}}{{ {math_names_y[ycol]} Correlation Coefficient }} \\\\")
     print("\hline")
     print("set & all & in binary & isolated & MSP & slow \\\\")
     print(f"\#pulsars & {len(ycol_df)} & {nbinary} & {nisolated} & {nmsp} & {nslow}\\\\")
     print("\hline")
-    print("$log_{10}(x)$ & $r_s (p, N)$ & $r_s (p, N)$ & $r_s (p, N)$ & $r_s (p, N)$ & $r_s (p, N)$ \\\\")
+    #print("$log_{10}(x)$ & $r_s (p, N)$ & $r_s (p, N)$ & $r_s (p, N)$ & $r_s (p, N)$ & $r_s (p, N)$ \\\\")
+    print("$log_{10}(x)$ & $r_s$ & $r_s$ & $r_s$ & $r_s$ & $r_s$ \\\\")
     print("\hline")
     for xa, xcol in enumerate(xcols):
         if ycol == "beta":
@@ -1104,9 +1109,9 @@ for ya, ycol in enumerate(ycols):
                 label=label,
             )
             sub_weights.append(weight_str)
-        print(f'${math_names_x[xcol]}$ & {" & ".join(sub_weights)} \\\\')
+        print(f'{math_names_x[xcol].split("(")[0]} & {" & ".join(sub_weights)} \\\\')
 
-        sns.regplot(data=this_df, x=xcol, y=ycol, ax=saxes[ya][xa])
+        #sns.regplot(data=this_df, x=xcol, y=ycol, ax=saxes[ya][xa])
     print("\hline")
     #print(f'{ycol} & {" & ".join(weights)} \\')
 sfig.savefig(f'corr_plots/coor_all.png', dpi=300)
