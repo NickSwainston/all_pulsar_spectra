@@ -1,86 +1,56 @@
 import pandas as pd
 import os
 import matplotlib.pyplot as plt
-from matplotlib.ticker import FormatStrFormatter, FuncFormatter
+from matplotlib.ticker import FuncFormatter
 import numpy as np
-import seaborn as sns
 from scipy import stats
-import math
-from jacobi import propagate
-import yaml
-
-from iminuit import Minuit
-from iminuit.cost import LeastSquares
 
 
-from pulsar_spectra.catalogue import CAT_DIR
-from pulsar_spectra.spectral_fit import huber_loss_function
 
+# Read and organise data
+# -----------------------------------------------------------------------------
 
+# Read in the fits
 df = pd.read_csv('all_pulsar_fits.csv')
 
-# filter to use only jankowski pulsars
-# with open(f"{CAT_DIR}/Jankowski_2018.yaml", "r") as stream:
-#     cat_dict = yaml.safe_load(stream)
-# jankowski_pulsars = cat_dict.keys()
-# df = df[df["Pulsar"].isin(jankowski_pulsars)]
-
-
-# grab model specific data frames
-spl_df  = df[df["Model"] == "simple_power_law"]
-bpl_df  = df[df["Model"] == "broken_power_law"]
-lps_df  = df[df["Model"] == "log_parabolic_spectrum"]
-hfto_df = df[df["Model"] == "high_frequency_cut_off_power_law"]
-lfto_df = df[df["Model"] == "low_frequency_turn_over_power_law"]
-dtos_df = df[df["Model"] == "double_turn_over_spectrum"]
+# Grab model specific data frames
+spl_df   = df[df["Model"] == "simple_power_law"]
+bpl_df   = df[df["Model"] == "broken_power_law"]
+hfto_df  = df[df["Model"] == "high_frequency_cut_off_power_law"]
+lfto_df  = df[df["Model"] == "low_frequency_turn_over_power_law"]
+dtos_df  = df[df["Model"] == "double_turn_over_spectrum"]
 nomod_df = df[df["Model"] == ""]
 smart_df = df[df["SMART"]]
-all_to_df = df[df["vpeak"].notnull()]
-sync_df = all_to_df[all_to_df["beta"] < 2.05]
-print(len(sync_df))
-thermal_df = all_to_df[all_to_df["beta"] >= 2.05]
-print(len(thermal_df))
-print(list(df[df["u_vc"]/df["vc"] > 3]["Pulsar"]))
-print(len(spl_df[spl_df["a"] > -1.2]) / len(spl_df))
 
 msp_cutoff = 0.03 # seconds
 
 # MSPs
-msp_spl_df  = spl_df[spl_df["ATNF Period (s)"] < msp_cutoff]
-msp_bpl_df  = bpl_df[bpl_df["ATNF Period (s)"] < msp_cutoff]
-msp_lps_df  = lps_df[lps_df["ATNF Period (s)"] < msp_cutoff]
+msp_spl_df  = spl_df[ spl_df["ATNF Period (s)"]  < msp_cutoff]
+msp_bpl_df  = bpl_df[ bpl_df["ATNF Period (s)"]  < msp_cutoff]
 msp_hfto_df = hfto_df[hfto_df["ATNF Period (s)"] < msp_cutoff]
 msp_lfto_df = lfto_df[lfto_df["ATNF Period (s)"] < msp_cutoff]
 msp_dtos_df = dtos_df[dtos_df["ATNF Period (s)"] < msp_cutoff]
 msp_df = df[df["ATNF Period (s)"] < msp_cutoff]
 
-# normal pulsars
-np_spl_df  = spl_df[spl_df["ATNF Period (s)"]   >= msp_cutoff]
-np_bpl_df  = bpl_df[bpl_df["ATNF Period (s)"]   >= msp_cutoff]
-np_lps_df  = lps_df[lps_df["ATNF Period (s)"]   >= msp_cutoff]
+# Normal pulsars
+np_spl_df  = spl_df[ spl_df["ATNF Period (s)"]  >= msp_cutoff]
+np_bpl_df  = bpl_df[ bpl_df["ATNF Period (s)"]  >= msp_cutoff]
 np_hfto_df = hfto_df[hfto_df["ATNF Period (s)"] >= msp_cutoff]
 np_lfto_df = lfto_df[lfto_df["ATNF Period (s)"] >= msp_cutoff]
 np_dtos_df = dtos_df[dtos_df["ATNF Period (s)"] >= msp_cutoff]
 np_df = df[df["ATNF Period (s)"] >= msp_cutoff]
 
 
-if len(lps_df) == 0:
-    del df["lps_a"]
-    del df["lps_u_a"]
-    del df["lps_b"]
-    del df["lps_u_b"]
-    del df["lps_c"]
-    del df["lps_u_c"]
-
+# Output summary in latex format
 print(f'''
 Model & Total & \% & MSP & \% & Normal & \% \\\\
 
-SPL &                  {len(spl_df)} &  {len(spl_df) /len(df)*100:.1f} \% &  {len(msp_spl_df)} &  {len(msp_spl_df) /len(msp_df)*100:.1f} \% &  {len(np_spl_df)} & {len(np_spl_df) /len(np_df)*100:.1f} \% \\\\
-BPL &                  {len(bpl_df)} &  {len(bpl_df) /len(df)*100:.1f} \% &  {len(msp_bpl_df)} &  {len(msp_bpl_df) /len(msp_df)*100:.1f} \% &  {len(np_bpl_df)} & {len(np_bpl_df) /len(np_df)*100:.1f} \% \\\\
-HFCO &  {len(hfto_df)} & {len(hfto_df)/len(df)*100:.1f} \% & {len(msp_hfto_df)} & {len(msp_hfto_df)/len(msp_df)*100:.1f} \% & {len(np_hfto_df)} & {len(np_hfto_df)/len(np_df)*100:.1f} \% \\\\
-LFTO & {len(lfto_df)} & {len(lfto_df)/len(df)*100:.1f} \% & {len(msp_lfto_df)} & {len(msp_lfto_df)/len(msp_df)*100:.1f} \% & {len(np_lfto_df)} & {len(np_lfto_df)/len(np_df)*100:.1f} \% \\\\
-DTOS &         {len(dtos_df)} & {len(dtos_df)/len(df)*100:.1f} \% & {len(msp_dtos_df)} & {len(msp_dtos_df)/len(msp_df)*100:.1f} \% & {len(np_dtos_df)} & {len(np_dtos_df)/len(np_df)*100:.1f} \% \\\\
-Total &                             {len(df)} &      {len(df)     /len(df)*100:.1f} \% & {len(msp_df)} &      {len(msp_df)     /len(msp_df)*100:.1f} \% &      {len(np_df)} & {len(np_df)     /len(np_df)*100:.1f} \%) \\\\
+SPL   & {len(spl_df)}  & {len(spl_df) /len(df)*100:.1f} \% & {len(msp_spl_df)}  & {len(msp_spl_df) /len(msp_df)*100:.1f} \% &  {len(np_spl_df)} & {len(np_spl_df) /len(np_df)*100:.1f} \% \\\\
+BPL   & {len(bpl_df)}  & {len(bpl_df) /len(df)*100:.1f} \% & {len(msp_bpl_df)}  & {len(msp_bpl_df) /len(msp_df)*100:.1f} \% &  {len(np_bpl_df)} & {len(np_bpl_df) /len(np_df)*100:.1f} \% \\\\
+HFCO  & {len(hfto_df)} & {len(hfto_df)/len(df)*100:.1f} \% & {len(msp_hfto_df)} & {len(msp_hfto_df)/len(msp_df)*100:.1f} \% & {len(np_hfto_df)} & {len(np_hfto_df)/len(np_df)*100:.1f} \% \\\\
+LFTO  & {len(lfto_df)} & {len(lfto_df)/len(df)*100:.1f} \% & {len(msp_lfto_df)} & {len(msp_lfto_df)/len(msp_df)*100:.1f} \% & {len(np_lfto_df)} & {len(np_lfto_df)/len(np_df)*100:.1f} \% \\\\
+DTOS  & {len(dtos_df)} & {len(dtos_df)/len(df)*100:.1f} \% & {len(msp_dtos_df)} & {len(msp_dtos_df)/len(msp_df)*100:.1f} \% & {len(np_dtos_df)} & {len(np_dtos_df)/len(np_df)*100:.1f} \% \\\\
+Total & {len(df)}      & {len(df)     /len(df)*100:.1f} \% & {len(msp_df)}      & {len(msp_df)     /len(msp_df)*100:.1f} \% &      {len(np_df)} & {len(np_df)     /len(np_df)*100:.1f} \%)\\\\
 ''')
 
 print(np.std(spl_df["a"], ddof=1) / np.sqrt(np.size(spl_df["a"])))
@@ -89,26 +59,28 @@ print(f'''
 \hline
 Model & All Mean & MSP Mean & Normal Mean \\\\
 \hline
-SPL &   ${spl_df["a"].mean():.2f}\pm {spl_df["a"].std():.2f}  $ & ${msp_spl_df["a"].mean():.2f}\pm { msp_spl_df["a"].std():.2f} $ & $ {np_spl_df["a"].mean():.2f}\pm { np_spl_df["a"].std():.2f}$ \\\\
+SPL &   ${spl_df["a"].mean():.2f} \pm {spl_df["a"].std():.2f} $ & ${msp_spl_df["a"].mean():.2f} \pm { msp_spl_df["a"].std():.2f}$ & $ {np_spl_df["a"].mean():.2f}\pm { np_spl_df["a"].std():.2f}$ \\\\
 HFCO &  ${hfto_df["a"].mean():.2f}\pm {hfto_df["a"].std():.2f}$ & ${msp_hfto_df["a"].mean():.2f}\pm {msp_hfto_df["a"].std():.2f}$ & ${np_hfto_df["a"].mean():.2f}\pm {np_hfto_df["a"].std():.2f}$ \\\\
 LFTO &  ${lfto_df["a"].mean():.2f}\pm {lfto_df["a"].std():.2f}$ & ${msp_lfto_df["a"].mean():.2f}\pm {msp_lfto_df["a"].std():.2f}$ & ${np_lfto_df["a"].mean():.2f}\pm {np_lfto_df["a"].std():.2f}$ \\\\
 DTOS &  ${dtos_df["a"].mean():.2f}\pm {dtos_df["a"].std():.2f}$ & ${msp_dtos_df["a"].mean():.2f}\pm {msp_dtos_df["a"].std():.2f}$ & ${np_dtos_df["a"].mean():.2f}\pm {np_dtos_df["a"].std():.2f}$ \\\\
-Total & ${df["a"].mean():.2f}\pm {df["a"].std():.2f}          $ & ${msp_df["a"].mean():.2f}\pm {     msp_df["a"].std():.2f}     $ & $     {np_df["a"].mean():.2f}\pm {     np_df["a"].std():.2f}$ \\\\
+Total & ${df["a"].mean():.2f}     \pm {df["a"].std():.2f}     $ & ${msp_df["a"].mean():.2f}     \pm {     msp_df["a"].std():.2f}$ & $     {np_df["a"].mean():.2f}\pm {     np_df["a"].std():.2f}$ \\\\
 \hline
 \\\\
 \hline
 Model & All Median & MSP Median & Normal Median \\\\
 \hline
-SPL &   ${spl_df["a"].median():.2f}\pm {spl_df["a"].std():.2f}  $ & ${msp_spl_df["a"].median():.2f}\pm { msp_spl_df["a"].std():.2f} $ & ${np_spl_df["a"].median():.2f}\pm { np_spl_df["a"].std():.2f}  $ \\\\
+SPL &   ${spl_df["a"].median():.2f} \pm {spl_df["a"].std():.2f} $ & ${msp_spl_df["a"].median():.2f} \pm { msp_spl_df["a"].std():.2f}$ & ${np_spl_df["a"].median():.2f} \pm { np_spl_df["a"].std():.2f} $ \\\\
 HFCO &  ${hfto_df["a"].median():.2f}\pm {hfto_df["a"].std():.2f}$ & ${msp_hfto_df["a"].median():.2f}\pm {msp_hfto_df["a"].std():.2f}$ & ${np_hfto_df["a"].median():.2f}\pm {np_hfto_df["a"].std():.2f} $ \\\\
 LFTO &  ${lfto_df["a"].median():.2f}\pm {lfto_df["a"].std():.2f}$ & ${msp_lfto_df["a"].median():.2f}\pm {msp_lfto_df["a"].std():.2f}$ & ${np_lfto_df["a"].median():.2f}\pm {np_lfto_df["a"].std():.2f} $ \\\\
 DTOS &  ${dtos_df["a"].median():.2f}\pm {dtos_df["a"].std():.2f}$ & ${msp_dtos_df["a"].median():.2f}\pm {msp_dtos_df["a"].std():.2f}$ & ${np_dtos_df["a"].median():.2f}\pm {np_dtos_df["a"].std():.2f} $ \\\\
-Total & ${df["a"].median():.2f}\pm {df["a"].std():.2f}          $ & ${msp_df["a"].median():.2f}\pm {     msp_df["a"].std():.2f}     $ & ${np_df["a"].median():.2f}\pm {     np_df["a"].std():.2f}      $ \\\\
+Total & ${     df["a"].median():.2f}\pm {df["a"].std():.2f}     $ & ${msp_df["a"].median():.2f}     \pm {     msp_df["a"].std():.2f}$ & ${np_df["a"].median():.2f}     \pm {     np_df["a"].std():.2f} $ \\\\
 \hline
 ''')
 
 
-# Set up the docs
+
+# Set up docs
+# -----------------------------------------------------------------------------
 
 # Record summary results on homepage
 with open(f'{os.path.dirname(os.path.realpath(__file__))}/docs/index.rst', 'w') as file:
@@ -404,11 +376,12 @@ All millisecond pulsar detections (these will be in other galleries).
   :width: 800
 ''')
 
-def cost(x, y, z):
-    return (x - 1) ** 2 + (y - x) ** 2 + (z - 2) ** 2
-#cost.errordef = Minuit.LEAST_SQUARES
 
-def make_histogram_plots(all_data, hist_range, label, titles, plotname):
+
+# Make some summary histograms
+# -----------------------------------------------------------------------------
+
+def make_histogram_plots(all_data, hist_range, label, titles, plotname, xlabel):
     # Make histogram plots
     n_bins = 20
     colours = [
@@ -422,19 +395,24 @@ def make_histogram_plots(all_data, hist_range, label, titles, plotname):
     fig, axes = plt.subplots(nrows=n_data, figsize=(5, 3*n_data))
 
     axes[0].hist(all_data, n_bins, density=True, histtype='bar', stacked=True, label=label, color=colours[:n_data-1])
-    axes[0].set_title("All spectral indexs")
+    axes[0].set_title(titles[0])
     axes[0].legend(prop={'size': 10})
+    axes[0].set_ylabel(f"Probability Density")
+    axes[0].set_xlabel(f"${xlabel}$")
 
-    for ai, df_col, colour, title in zip(range(1, n_data), all_data, colours, titles):
+    for ai, df_col, colour, title in zip(range(1, n_data), all_data, colours, titles[1:]):
         #print(ai, n_data)
         axes[ai].hist(df_col, n_bins, histtype='bar', color=colour, range=hist_range)
         axes[ai].set_title(title)
+        axes[ai].set_ylabel(f"#")
+        axes[ai].set_xlabel(f"${xlabel}$")
 
     fig.tight_layout()
     fig.savefig(plotname)
     plt.close(fig)
 
-# alpha hist
+
+# Alpha histogram
 all_indexs = np.array([
     spl_df ["a"],
     hfto_df["a"],
@@ -443,36 +421,32 @@ all_indexs = np.array([
 ])
 hist_range = (min(df["a"]), max(df["a"]))
 titles = [
-    'All spectral indexs',
+    'All models',
     'Simple power law',
     'High-frequency cut off',
     'Low-frequency turn over',
     'Double turn over spectrum',
 ]
-make_histogram_plots(all_indexs, hist_range, label=["spl", "hfto", "lfto", "dtos"], titles=titles, plotname="spectral_index_histogram.png")
+make_histogram_plots(all_indexs, hist_range, label=["spl", "hfto", "lfto", "dtos"], titles=titles, plotname="spectral_index_histogram.png", xlabel="\\alpha")
 
 
-# Make spectral index histogram plots for vc
-# ------------------------------------------
+# Vc histogram
 hist_range = (np.log10(df["vc"].min()), np.log10(df["vc"].max()))
 all_indexs = np.array([
     np.log10(hfto_df["vc"]),
     np.log10(dtos_df["vc"]),
 ])
 titles = [
-    'All vc',
+    'All models',
     'High-frequency cut off',
     'Double turn over spectrum',
 ]
-make_histogram_plots(all_indexs, hist_range, label=["hfto", "dtos"], titles=titles, plotname="vc_histogram.png")
-# just high frequency
+make_histogram_plots(all_indexs, hist_range, label=["hfto", "dtos"], titles=titles, plotname="vc_histogram.png", xlabel="\\nu_c")
+# Redo with just high frequency trun over
 fig, ax = plt.subplots()
 ax.hist(np.log10(hfto_df["vc"]), 20, histtype='bar', color='blue')
-# ax.set_xscale('log')
-# ax.xaxis.set_major_formatter(FormatStrFormatter('%g'))
 ax.xaxis.set_major_formatter(
     FuncFormatter(lambda x, _:
-        #f'$\mathdefault{{10^{{{x:.2f}}}}}$'
         f'{10**x/1e9:.1f}'
     )
 )
@@ -482,8 +456,7 @@ fig.tight_layout()
 fig.savefig("vc_histogram_just_hfto.png")
 plt.close(fig)
 
-# Make spectral index histogram plots for vpeak
-# ------------------------------------------
+# Vpeak histogram
 n_bins = 20
 hist_range = (np.log10(df["vpeak"].min()), np.log10(df["vpeak"].max()))
 
@@ -492,38 +465,12 @@ all_indexs = np.array([
     np.log10(dtos_df["vpeak"]),
 ])
 titles = [
-    'All vpeak',
+    'All models',
     'Low-frequency turn over',
     'Double turn over spectrum',
 ]
+make_histogram_plots(all_indexs, hist_range, label=["lfto", "dtos"], titles=titles, plotname="vpeak_histogram.png", xlabel="\\nu_{peak}")
 
-make_histogram_plots(all_indexs, hist_range, label=["lfto", "dtos"], titles=titles, plotname="vpeak_histogram.png")
-
-# # Remove unessiary columns
-# del df["Pulsar"]
-# # del df["Model"]
-# del df["Probability Best"]
-# del df["N data flux"]
-
-# # Remove broken power law stuff
-# del df["vb"]
-# del df["a1"]
-# del df["a2"]
-# for col_name in df.keys():
-#     if "u_" in col_name or col_name.endswith("_c"):
-#         del df[col_name]
-
-f, ax = plt.subplots(figsize=(10, 5))
-# Plot correlations
-corr = df.corr()
-mask = np.triu(np.ones_like(corr, dtype=bool))
-sns.heatmap(corr, annot=True,
-            cmap='seismic', mask=mask,
-            vmin=-1, vmax=1,)
-corr.to_csv(f"pulsar_coor.csv")
-plt.tight_layout(pad=0.5)
-plt.savefig("pulsar_coor.png")
-plt.clf()
 
 log_df = df#[df["beta"] < 2.05]
 # convert to log data
@@ -539,50 +486,13 @@ for col_name in log_df.keys():
         log_df["u_" + col_name + " log"] = log_df["u_" + col_name] / log_df[col_name]
         #del log_df[col_name]
 
-print(log_df.keys())
 log_df_sync = log_df[log_df["beta"] < 2.05]
 
-# Plot correlation
-corr = log_df.corr()
-mask = np.triu(np.ones_like(corr, dtype=bool))
-sns.heatmap(corr, annot=True,
-            cmap='seismic', mask=mask,
-            vmin=-1, vmax=1,)
-corr.to_csv(f"pulsar_coor_log.csv")
-plt.tight_layout(pad=0.5)
-plt.savefig("pulsa_coor_log.png")
+# Calculate correlation coefficients and make plots
+# -----------------------------------------------------------------------------
 
-def weighted_correlation(x, y, yerr):
-    """Weighted correlation based on:
-    https://en.wikipedia.org/wiki/Pearson_correlation_coefficient#Weighted_correlation_coefficient
-    """
-    # weights based on y uncertainty
-    w = 1 / yerr**2
-    # weighted mean
-    mx = np.sum( w * x ) / np.sum( w )
-    my = np.sum( w * y ) / np.sum( w )
-    # weighted covariance
-    cov_xy = np.sum( w * (x - mx) * (y - my) ) / np.sum( w )
-    cov_xx = np.sum( w * (x - mx) * (x - mx) ) / np.sum( w )
-    cov_yy = np.sum( w * (y - my) * (y - my) ) / np.sum( w )
-    # weighted correlation
-    corr = cov_xy / np.sqrt( cov_xx * cov_yy )
-    return corr
-
-def line(x, g, c):
-    return g * x + c
-
-def power_law(x, a, c):
-    return c*x**a
-
-def yline(x, g, xmean, ymean):
-    return ymean + g * (x - xmean)
-
-def xline(y, g, ymean, xmean):
-    return xmean + g * (y - ymean)
-
-def spearmanr_ci(x,y,alpha=0.05):
-    ''' calculate spearmanr correlation along with the confidence interval using scipy and numpy
+def spearmanr_ci(x, y, alpha=0.05):
+    """ Calculate spearmanr correlation along with the confidence interval using scipy and numpy
     Parameters
     ----------
     x, y : iterable object such as a list or np.array
@@ -597,7 +507,7 @@ def spearmanr_ci(x,y,alpha=0.05):
       The corresponding p value
     lo, hi : float
       The lower and upper bound of confidence intervals
-    '''
+    """
 
     r, p = stats.spearmanr(x, y, nan_policy="omit")
     r_z = np.arctanh(r)
@@ -607,7 +517,7 @@ def spearmanr_ci(x,y,alpha=0.05):
     lo, hi = np.tanh((lo_z, hi_z))
     return r, p, lo, hi
 
-def line_fit(
+def plot_correlations(
         this_df,
         xcol,
         ycol,
@@ -616,6 +526,7 @@ def line_fit(
         lax=None,
         label=None,
     ):
+    # Set up data
     x = []
     y = []
     yerr = []
@@ -637,12 +548,11 @@ def line_fit(
     vpeak_x = []
     vpeak_y = []
     vpeak_yerr = []
+    # Extract data and split into MSP and Slow pulsars
     for xi, yi, yerri, raw_xi, raw_yi, raw_yerri, period, min_freq in zip(
             list(this_df[xcol]), list(this_df[ycol]), list(this_df["u_"+ycol]),
             list(this_df[raw_xcol]), list(this_df[raw_ycol]), list(this_df["u_"+raw_ycol]),
             list(this_df["ATNF Period (s)"]), list(this_df["Min freq (MHz)"])):
-        # if ycol == "vc log":
-        #     print(xi, yi, yerri)
         if (not np.isnan(xi)) and ( not np.isnan(yi) ) and ( not np.isnan(yerri) ) and (not np.isinf(xi)):
             x.append(xi)
             y.append(yi)
@@ -650,9 +560,9 @@ def line_fit(
             raw_x.append(raw_xi)
             raw_y.append(raw_yi)
             raw_yerr.append(raw_yerri)
-            # msp check
+            # MSP check
             if period < msp_cutoff:
-                #msp
+                # MSP
                 msp_x.append(xi)
                 msp_y.append(yi)
                 msp_yerr.append(yerri)
@@ -660,7 +570,7 @@ def line_fit(
                 msp_raw_y.append(raw_yi)
                 msp_raw_yerr.append(raw_yerri)
             else:
-                #normal
+                # Normal (slow)
                 np_x.append(xi)
                 np_y.append(yi)
                 np_yerr.append(yerri)
@@ -672,7 +582,7 @@ def line_fit(
             vpeak_y.append(min_freq*1e6)
             vpeak_yerr.append(min_freq*1e6*0.1)
 
-
+    # Convert everything to nupmy arrays
     x = np.array(x)
     y = np.array(y)
     yerr = np.array(yerr)
@@ -691,10 +601,10 @@ def line_fit(
     np_raw_x     = np.array(np_raw_x)
     np_raw_y     = np.array(np_raw_y)
     np_raw_yerr  = np.array(np_raw_yerr)
+
+    # Convert to common units
     if "v" in ycol:
         # Convert to GHz
-        # y    /= 10**6
-        # yerr /= 10**6
         raw_y        /= 10**9
         raw_yerr     /= 10**9
         msp_y        /= 10**9
@@ -707,82 +617,21 @@ def line_fit(
         np_raw_yerr  /= 10**9
     if "Age" in xcol:
         # Convert to Myr
-        # y    /= 10**6
-        # yerr /= 10**6
         raw_x     /= 10**6
         msp_x     /= 10**6
         np_x      /= 10**6
         msp_raw_x /= 10**6
         np_raw_x  /= 10**6
-    # print(f"\nCorrelations of x: {xcol} and y: {ycol}. N: {len(x)}")
-    # print(f"-------------------------------------------------")
-    # print(f"pandas:        {corr_matrix[xcol][ycol]:6.3f}")
-    # print(f"numpy:         {np.corrcoef(x,y)[0][1]:6.3f}")
-    # weighted_corr = weighted_correlation(x, y ,yerr)
+
+    # Calculate spearman correlation coefficient
     rho, pval, lo, hi = spearmanr_ci(x, y)
     if abs(rho) >= 0.4 and pval < 0.01/105:
         weights_str = f"{{\\bf {rho:.2f}}} ({pval:.1e}, {len(x)})"
     else:
         weights_str = f"{rho:.2f} ({pval:.1e}, {len(x)})"
-    # if abs(rho) >= 0.4 and pval < 0.01/105:
-    #     weights_str = f"{{\\bf \Large {rho:.2f}}}"
-    # else:
-    #     weights_str = f"{rho:.2f}"
-    # print(f"weighted corr: {weighted_correlation(x, y ,yerr):6.3f}")
-    # print(f"spearmanr:     {rho:6.3f}")
 
     if lax is not None:
         f, ax = plt.subplots()
-
-        # fit y line
-        # least_squares = LeastSquares(x, y, yerr, yline)
-        # xmean=np.mean(x)
-        # ymean=np.mean(y)
-        # m = Minuit(least_squares, g=0, xmean=xmean, ymean=ymean)
-        # m.fixed["xmean"] = True
-        # m.fixed["ymean"] = True
-
-
-        # if 'log' in xcol and 'log' in ycol:
-        #     # least_squares = LeastSquares(raw_x, raw_y, raw_yerr, power_law)
-        #     least_squares = LeastSquares(raw_x, raw_y, 0.1 / np.log(10) , power_law)
-        #     m = Minuit(least_squares, a=0, c=0)
-        #     m.migrad()  # finds minimum of least_squares function
-        #     m.hesse()   # accurately computes uncertaintiesax):
-        #     # print(ycol, xcol)
-        #     # print(m)
-        #     # exit()
-        #     fit_x = np.logspace(np.log10(min(raw_x)), np.log10(max(raw_x)), num=len(raw_x))
-        #     fitted_line, fitted_line_cov = propagate(lambda p: power_law(fit_x, *p), m.values, m.covariance)
-        #     fitted_line_err = abs(np.diag(fitted_line_cov) ** 0.5)
-        # else:
-        #     # least_squares = LeastSquares(x, y, yerr, line)
-        #     least_squares = LeastSquares(x, y, y*0.1, line)
-        #     least_squares.loss = huber_loss_function
-        #     m = Minuit(least_squares, g=0, c=-1)
-        #     m.migrad()  # finds minimum of least_squares function
-        #     m.hesse()   # accurately computes uncertaintiesax):
-        #     fit_x = np.logspace(np.log10(min(x)), np.log10(max(x)), num=len(x))
-        #     fitted_line, fitted_line_cov = propagate(lambda p: line(fit_x, *p), m.values, m.covariance)
-        #     fitted_line_err = abs(np.diag(fitted_line_cov) ** 0.5)
-        #     if "log" in ycol:
-        #         fitted_line = 10**fitted_line
-        #         fitted_line_err = fitted_line * np.log(10) * fitted_line_err
-        #         #print(max(fitted_line_err/fitted_line))
-        #     if "v" in ycol:
-        #         # Convert to MHz
-        #         fitted_line     /= 10**6
-        #         fitted_line_err /= 10**6
-        #         #print(max(fitted_line_err/fitted_line))
-        # # least_squares = LeastSquares(x, y, yerr, cost)
-        # # m = Minuit(least_squares, y=0, z=0)
-        # # m.migrad()
-        # # m.draw_mncontour("x", "y", cl=(0.68, 0.9, 0.99))
-        # #print(f"error percent: {np.mean(fitted_line_err/fitted_line)}")
-        # ax.plot( fit_x, fitted_line, label="fit", c='orange')
-        # lax.plot(fit_x, fitted_line, label="fit", c='orange')
-        # ax.fill_between( fit_x, fitted_line - fitted_line_err, fitted_line + fitted_line_err, facecolor="C1", alpha=alpha)
-        # lax.fill_between(fit_x, fitted_line - fitted_line_err, fitted_line + fitted_line_err, facecolor="C1", alpha=alpha)
 
         capsize = 1.5
         errorbar_linewidth = 0.7
@@ -792,12 +641,6 @@ def line_fit(
         colour = "b"
         ecolour = 'gray'
         alpha = 0.6
-        # if "Period" not in xcol and ycol != "vpeak log":
-        # if 'vc' in ycol and 'Age' in xcol:
-        #     print(list(np_x))
-        #     print(list(np_y))
-        #     print(list(np_yerr))
-        #     exit()
         (_, caps, _) = ax.errorbar(np_raw_x, np_raw_y, np.array(np_raw_yerr) / 2.,
             fmt="o",
             markeredgewidth=marker_border_thickness,
@@ -811,8 +654,7 @@ def line_fit(
         )
         for cap in caps:
             cap.set_markeredgewidth(errorbar_linewidth)
-        # else:
-        #     ax.set_xlim([np_raw_x[0], 0.03])
+
         (_, caps, _) = lax.errorbar(np_raw_x, np_raw_y, np.array(np_raw_yerr) / 2.,
             fmt="o",
             markeredgewidth=marker_border_thickness,
@@ -842,6 +684,7 @@ def line_fit(
             )
             for cap in caps:
                 cap.set_markeredgewidth(errorbar_linewidth)
+
             (_, caps, _) = lax.errorbar(msp_raw_x, msp_raw_y, np.array(msp_raw_yerr) / 2.,
                 fmt="^",
                 markeredgewidth=marker_border_thickness,
@@ -856,62 +699,16 @@ def line_fit(
             for cap in caps:
                 cap.set_markeredgewidth(errorbar_linewidth)
 
-        # plot fit line and error bar
-        # print(x)
-        # print(y)
-        # fitted_line, fitted_line_cov = propagate(lambda p: yline(x, *p), m.values, m.covariance)
-        # print(fitted_line)
-        # print(fitted_line_err)
-
         if ycol == "vc log" and xcol == "ATNF Spin Frequency (Hz) log":
-            # Display a theory line
+            # Display a theory line from https://ui.adsabs.harvard.edu/abs/2013Ap%26SS.345..169K/abstract
             fit_x = np.logspace(np.log10(min(raw_x)), np.log10(max(raw_x)))
             fit_y    = 1.4*10**9 * (fit_x)**0.46 / 10**9
             fit_y_lu = 1.4*10**9 * (fit_x)**0.28 / 10**9
             fit_y_hu = 1.4*10**9 * (fit_x)**0.64 / 10**9
-            #print(fit_y)
-            # fit_y = fit_y / max(fit_y) * max(raw_y)
-            # print(fit_y)
             ax.plot( fit_x, fit_y, label='theory', color='purple')
             lax.plot(fit_x, fit_y, label='theory', color='purple')
             ax.fill_between( fit_x, fit_y_lu, fit_y_hu, facecolor='purple', alpha=alpha)
             lax.fill_between(fit_x, fit_y_lu, fit_y_hu, facecolor='purple', alpha=alpha)
-
-
-        if ycol == "vpeak log":
-            #print(vpeak_x, vpeak_y, vpeak_yerr)
-            # Add vpeak limits
-            colour = 'orange'
-            if "Period" in xcol:
-                (_, caps, _) = ax.errorbar(
-                    vpeak_x, vpeak_y, vpeak_yerr,
-                    uplims=True,
-                    fmt="^",
-                    markeredgewidth=marker_border_thickness,
-                    elinewidth=errorbar_linewidth,
-                    capsize=capsize,
-                    markersize=markersize,
-                    label="MSPs",
-                    ecolor=ecolour,
-                    c=colour,
-                    alpha=alpha,
-                )
-                for cap in caps:
-                    cap.set_markeredgewidth(errorbar_linewidth)
-            # (_, caps, _) = lax.errorbar(
-            #     vpeak_x, vpeak_y, vpeak_yerr,
-            #     uplims=True,
-            #     fmt="o",
-            #     markeredgewidth=marker_border_thickness,
-            #     elinewidth=errorbar_linewidth,
-            #     capsize=capsize,
-            #     markersize=markersize,
-            #     label="MSPs",
-            #     ecolor=ecolour,
-            #     c=colour,
-            # )
-            # for cap in caps:
-            #     cap.set_markeredgewidth(errorbar_linewidth)
 
         # Labels
         ax.set_xlabel( f"{math_names_x[xcol]}")
@@ -923,8 +720,6 @@ def line_fit(
         if 'log' in xcol:
             ax.set_xscale('log')
             lax.set_xscale('log')
-            # ax.get_xaxis().set_major_formatter(FormatStrFormatter('%g'))
-            # lax.get_xaxis().set_major_formatter(FormatStrFormatter('%g'))
             ax.xaxis.set_major_formatter(
                 FuncFormatter(lambda x, p:
                     # '$\mathdefault{10^{%i}}$' % x
@@ -942,8 +737,6 @@ def line_fit(
         if 'log' in ycol:
             ax.set_yscale('log')
             lax.set_yscale('log')
-            # ax.get_yaxis().set_major_formatter(FormatStrFormatter('%g'))
-            # lax.get_yaxis().set_major_formatter(FormatStrFormatter('%g'))
             ax.yaxis.set_major_formatter(
                 FuncFormatter(lambda x, p:
                     '$\mathdefault{10^{%i}}$' % x
@@ -960,16 +753,6 @@ def line_fit(
             )
         ax.tick_params(which='both', direction='in', top=1, right=1)
         lax.tick_params(which='both', direction='in', top=1, right=1)
-
-        # # display legend with some fit info
-        # fit_info = [
-        #     f"$\\chi^2$ / $n_\\mathrm{{dof}}$ = {m.fval:.1f} / {len(x) - m.nfit}",
-        # ]
-        # for p, v, e in zip(m.parameters, m.values, m.errors):
-        #     fit_info.append(f"{p} = ${v:.3f} \\pm {e:.3f}$")
-
-        # f.legend(title="\n".join(fit_info))
-        #ax.set_title(f"{label}")
         f.tight_layout()
         f.savefig(f'corr_plots/corr_line_{ycol}_{xcol.replace("/", "_")}_{label}.png'.replace(" ", "_"), dpi=300)
         plt.close(f)
@@ -1024,16 +807,15 @@ math_names_y = {
 }
 nx = len(xcols)
 ny = len(ycols)
+# Make figures and axis for each pulsar type
 sfig, saxes = plt.subplots(ny, nx, figsize=(5*nx, 5*ny))
 lfig, laxes = plt.subplots(ny, nx, figsize=(5*nx, 5*ny))
 bfig, baxes = plt.subplots(ny, nx, figsize=(5*nx, 5*ny))
 ifig, iaxes = plt.subplots(ny, nx, figsize=(5*nx, 5*ny))
 mfig, maxes = plt.subplots(ny, nx, figsize=(5*nx, 5*ny))
 sfig, saxes = plt.subplots(ny, nx, figsize=(5*nx, 5*ny))
-corr_matrix = log_df.corr()
-# print(list(df[df.notnull()]["ATNF Fdot"]))
-# print(list(log_df[log_df.notnull()]["ATNF Fdot log"]))
-# exit()
+
+# Loop over fit parameters
 for ya, ycol in enumerate(ycols):
     weights = []
     ycol_df = log_df[log_df[ycol].notnull()]
@@ -1043,6 +825,8 @@ for ya, ycol in enumerate(ycols):
     nisolated = len(ycol_df[ycol_df["ANTF Binary (type)"].isnull()])
     nmsp      = len(ycol_df[ycol_df["ATNF Period (s)"] < msp_cutoff])
     nslow     = len(ycol_df[ycol_df["ATNF Period (s)"] >= msp_cutoff])
+
+    # Output latex correlation table
     print("")
     print("\\\\")
     print(f"\multicolumn{{6}}{{c}}{{ {math_names_y[ycol]} Correlation Coefficient }} \\\\")
@@ -1050,10 +834,13 @@ for ya, ycol in enumerate(ycols):
     print("set & all & in binary & isolated & MSP & slow \\\\")
     print(f"\#pulsars & {len(ycol_df)} & {nbinary} & {nisolated} & {nmsp} & {nslow}\\\\")
     print("\hline")
-    #print("$log_{10}(x)$ & $r_s (p, N)$ & $r_s (p, N)$ & $r_s (p, N)$ & $r_s (p, N)$ & $r_s (p, N)$ \\\\")
-    print("$log_{10}(x)$ & $r_s$ & $r_s$ & $r_s$ & $r_s$ & $r_s$ \\\\")
+    print("$log_{10}(x)$ & $r_s (p, N)$ & $r_s (p, N)$ & $r_s (p, N)$ & $r_s (p, N)$ & $r_s (p, N)$ \\\\")
+    # print("$log_{10}(x)$ & $r_s$ & $r_s$ & $r_s$ & $r_s$ & $r_s$ \\\\")
     print("\hline")
+
+    # Loop over pulsar paramters
     for xa, xcol in enumerate(xcols):
+        # Filter out some fits
         if ycol == "beta":
             this_df = log_df_sync
         else:
@@ -1073,7 +860,8 @@ for ya, ycol in enumerate(ycols):
             this_df = this_df[this_df["L400 (mJy kpc^2)"] > 3]
         if xcol == "L1400 (mJy kpc^2) log":
             this_df = this_df[this_df["L1400 (mJy kpc^2)"] > 0.1]
-        # Make
+
+        # Remove log from col
         if "log" in xcol:
             raw_xcol = xcol[:-4]
         else:
@@ -1083,12 +871,12 @@ for ya, ycol in enumerate(ycols):
         else:
             raw_ycol = ycol
 
+        # Loop over each pulsar types
         sub_weights = []
-        binary_df = this_df[this_df["ANTF Binary (type)"].notnull()]
+        binary_df   = this_df[this_df["ANTF Binary (type)"].notnull()]
         isolated_df = this_df[this_df["ANTF Binary (type)"].isnull()]
-        msp_df  = this_df[this_df["ATNF Period (s)"] < msp_cutoff]
-        slow_df = this_df[this_df["ATNF Period (s)"] >= msp_cutoff]
-
+        msp_df      = this_df[this_df["ATNF Period (s)"] < msp_cutoff]
+        slow_df     = this_df[this_df["ATNF Period (s)"] >= msp_cutoff]
         df_axes_pairs = [
             (this_df,     laxes, 'All Pulsars'),
             (binary_df,   baxes, 'Only Binary Pulsars'),
@@ -1096,10 +884,8 @@ for ya, ycol in enumerate(ycols):
             (msp_df,      maxes, 'Only MSPs'),
             (slow_df,     saxes, 'Only Slow Pulsars'),
         ]
-
-        # print(f"line:          {weighted_line_corr:6.3f}")
         for sub_df, sub_axes, label in df_axes_pairs:
-            weight_str = weighted_line_corr = line_fit(
+            weight_str = weighted_line_corr = plot_correlations(
                 sub_df,
                 xcol,
                 ycol,
@@ -1109,15 +895,21 @@ for ya, ycol in enumerate(ycols):
                 label=label,
             )
             sub_weights.append(weight_str)
-        print(f'{math_names_x[xcol].split("(")[0]} & {" & ".join(sub_weights)} \\\\')
 
-        #sns.regplot(data=this_df, x=xcol, y=ycol, ax=saxes[ya][xa])
+        # Output latex results
+        print(f'{math_names_x[xcol].split("(")[0]} & {" & ".join(sub_weights)} \\\\')
     print("\hline")
-    #print(f'{ycol} & {" & ".join(weights)} \\')
-sfig.savefig(f'corr_plots/coor_all.png', dpi=300)
+
+# Save plots
+sfig.tight_layout()
+sfig.savefig(f'corr_plots/coor_all.png',          dpi=300)
 lfig.tight_layout()
 lfig.savefig(f'corr_plots/corr_all_weighted.png', dpi=300)
-bfig.savefig(f'corr_plots/corr_b_weighted.png', dpi=300)
-ifig.savefig(f'corr_plots/corr_i_weighted.png', dpi=300)
-mfig.savefig(f'corr_plots/corr_m_weighted.png', dpi=300)
-sfig.savefig(f'corr_plots/corr_s_weighted.png', dpi=300)
+bfig.tight_layout()
+bfig.savefig(f'corr_plots/corr_b_weighted.png',   dpi=300)
+ifig.tight_layout()
+ifig.savefig(f'corr_plots/corr_i_weighted.png',   dpi=300)
+mfig.tight_layout()
+mfig.savefig(f'corr_plots/corr_m_weighted.png',   dpi=300)
+sfig.tight_layout()
+sfig.savefig(f'corr_plots/corr_s_weighted.png',   dpi=300)
