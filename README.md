@@ -8,6 +8,11 @@ If using any of the data, please cite [Swainston et al. (2022)](https://ui.adsab
 and [Nicholas Swainston's thesis](https://catalogue.curtin.edu.au/discovery/search?vid=61CUR_INST:CUR_ALMA>) (link will be updated once it is published).
 Chapter 6 of the thesis analysed version 2.0.0.
 
+You can also reference this repository using the following DOI:
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7395486.svg)](https://doi.org/10.5281/zenodo.7395486)
+
+
 ## Running
 Install [pulsar_spectra](https://github.com/NickSwainston/pulsar_spectra) then fit all pulsars spectra with
 
