@@ -151,7 +151,7 @@ Single Power Law Results
 
 ''')
     for index, row in spl_df.iterrows():
-        data_str = f'   ":ref:`{row["Pulsar"]}`", '
+        data_str = f'    ":ref:`{row["Pulsar"]}`", '
         for val, error in [("a", "u_a")]:
             if "v" in val:
                 data_str += f'"{int(row[val]/1e6):d}±{int(row[error]/1e6):d}", '
@@ -169,7 +169,7 @@ Broken Power Law Results
 
 ''')
     for index, row in bpl_df.iterrows():
-        data_str = f'   ":ref:`{row["Pulsar"]}`", '
+        data_str = f'    ":ref:`{row["Pulsar"]}`", '
         for val, error in [("vb", "u_vb"), ("a1", "u_a1"), ("a2","u_a2")]:
             if "v" in val:
                 data_str += f'"{int(row[val]/1e6):d}±{int(row[error]/1e6):d}", '
@@ -187,7 +187,7 @@ Low Frequency Turn Over Results
 
 ''')
     for index, row in lfto_df.iterrows():
-        data_str = f'   ":ref:`{row["Pulsar"]}`", '
+        data_str = f'    ":ref:`{row["Pulsar"]}`", '
         for val, error in [("vpeak", "u_vpeak"), ("a", "u_a"), ("beta", "u_beta")]:
             if "v" in val:
                 data_str += f'"{int(row[val]/1e6):d}±{int(row[error]/1e6):d}", '
@@ -205,7 +205,7 @@ High Frequency Cut Off Results
 
 ''')
     for index, row in hfto_df.iterrows():
-        data_str = f'   ":ref:`{row["Pulsar"]}`", '
+        data_str = f'    ":ref:`{row["Pulsar"]}`", '
         for val, error in [("vc", "u_vc"), ("a", "u_a")]:
             if "v" in val:
                 data_str += f'"{int(row[val]/1e6):d}±{int(row[error]/1e6):d}", '
@@ -223,7 +223,7 @@ Double Turn Over Spectrum Results
 
 ''')
     for index, row in dtos_df.iterrows():
-        data_str = f'   ":ref:`{row["Pulsar"]}`", '
+        data_str = f'    ":ref:`{row["Pulsar"]}`", '
         for val, error in [("vc", "u_vc"), ("vpeak", "u_vpeak"), ("a", "u_a"), ("beta", "u_beta")]:
             if "v" in val:
                 data_str += f'"{int(row[val]/1e6):d}±{int(row[error]/1e6):d}", '
