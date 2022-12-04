@@ -3,7 +3,7 @@ Pulsar Spectra all pulsars fit results
 ======================================
 
 The following is the result of fitting all pulsars with more than four flux density measurements in version
-2.0.1 of pulsar_spectra. If using any of the data, please cite `Swainston et al. (2022) <https://ui.adsabs.harvard.edu/abs/2022PASA...39...56S/abstract>`_
+2.0.0 of pulsar_spectra. If using any of the data, please cite `Swainston et al. (2022) <https://ui.adsabs.harvard.edu/abs/2022PASA...39...56S/abstract>`_
 and `Nicholas Swainston's thesis <https://catalogue.curtin.edu.au/discovery/search?vid=61CUR_INST:CUR_ALMA>`_ (link will be updated once it is published).
 Chapter 6 of the thesis analyised version 2.0.0.
 
