@@ -4,8 +4,9 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import FuncFormatter
 import numpy as np
 from scipy import stats
+import glob
 
-
+import pulsar_spectra
 
 # Read and organise data
 # -----------------------------------------------------------------------------
@@ -88,73 +89,65 @@ with open(f'{os.path.dirname(os.path.realpath(__file__))}/docs/index.rst', 'w') 
 Pulsar Spectra all pulsars fit results
 ======================================
 
-.. toctree::
-   :maxdepth: 1
-   :caption: Spectral Model Gallerys:
-
-   spl_gallery
-   bpl_gallery
-   lfto_gallery
-   hfco_gallery
-   dtos_gallery
-
+The following is the result of fitting all pulsars with more than four flux density measurements in version
+{pulsar_spectra.__version__} of pulsar_spectra. If using any of the data, please cite `Swainston et al. (2022) <https://ui.adsabs.harvard.edu/abs/2022PASA...39...56S/abstract>`_
+and `Nicholas Swainston's thesis <https://catalogue.curtin.edu.au/discovery/search?vid=61CUR_INST:CUR_ALMA>`_ (link will be updated once it is published).
+Chapter 6 of the thesis analyised version 2.0.0.
 
 .. toctree::
-   :maxdepth: 1
-   :caption: Other Gallerys:
+    :maxdepth: 1
+    :caption: Spectral Fit Summaries:
 
-   smart_gallery
-   msp_gallery
+    spectral_index_summary
+    vpeak_summary
+    vc_summary
+
+
+.. toctree::
+    :maxdepth: 1
+    :caption: Spectral Model Gallerys:
+
+    spl_gallery
+    bpl_gallery
+    lfto_gallery
+    hfco_gallery
+    dtos_gallery
+
+
+.. toctree::
+    :maxdepth: 1
+    :caption: Other Gallerys:
+
+    smart_gallery
+    msp_gallery
 
 
 Fit Summary Pulsar Count
 ------------------------
 .. csv-table::
-   :header: "Model", "Total", "%", "MSP", "%", "Normal", "%"
+    :header: "Model", "Total", "%", "MSP", "%", "Normal", "%"
 
-   "simple_power_law",                  "{len(spl_df)}",  "{len(spl_df) /len(df)*100:.1f} %",  "{len(msp_spl_df)}",  "{len(msp_spl_df) /len(msp_df)*100:.1f} %",  "{len(np_spl_df)}", "{len(np_spl_df) /len(np_df)*100:.1f} %"
-   "broken_power_law",                  "{len(bpl_df)}",  "{len(bpl_df) /len(df)*100:.1f} %",  "{len(msp_bpl_df)}",  "{len(msp_bpl_df) /len(msp_df)*100:.1f} %",  "{len(np_bpl_df)}", "{len(np_bpl_df) /len(np_df)*100:.1f} %"
-   "high_frequency_cut_off_power_law",  "{len(hfto_df)}", "{len(hfto_df)/len(df)*100:.1f} %", "{len(msp_hfto_df)}", "{len(msp_hfto_df)/len(msp_df)*100:.1f} %", "{len(np_hfto_df)}", "{len(np_hfto_df)/len(np_df)*100:.1f} %"
-   "low_frequency_turn_over_power_law", "{len(lfto_df)}", "{len(lfto_df)/len(df)*100:.1f} %", "{len(msp_lfto_df)}", "{len(msp_lfto_df)/len(msp_df)*100:.1f} %", "{len(np_lfto_df)}", "{len(np_lfto_df)/len(np_df)*100:.1f} %"
-   "double_turn_over_spectrum",         "{len(dtos_df)}", "{len(dtos_df)/len(df)*100:.1f} %", "{len(msp_dtos_df)}", "{len(msp_dtos_df)/len(msp_df)*100:.1f} %", "{len(np_dtos_df)}", "{len(np_dtos_df)/len(np_df)*100:.1f} %"
-   "Total",                             "{len(df)}",      "{len(df)     /len(df)*100:.1f} %", "{len(msp_df)}",      "{len(msp_df)     /len(msp_df)*100:.1f} %",      "{len(np_df)}", "{len(np_df)     /len(np_df)*100:.1f} %"
+    "simple_power_law",                  "{len(spl_df)}",  "{len(spl_df) /len(df)*100:.1f} %",  "{len(msp_spl_df)}",  "{len(msp_spl_df) /len(msp_df)*100:.1f} %",  "{len(np_spl_df)}", "{len(np_spl_df) /len(np_df)*100:.1f} %"
+    "broken_power_law",                  "{len(bpl_df)}",  "{len(bpl_df) /len(df)*100:.1f} %",  "{len(msp_bpl_df)}",  "{len(msp_bpl_df) /len(msp_df)*100:.1f} %",  "{len(np_bpl_df)}", "{len(np_bpl_df) /len(np_df)*100:.1f} %"
+    "high_frequency_cut_off_power_law",  "{len(hfto_df)}", "{len(hfto_df)/len(df)*100:.1f} %", "{len(msp_hfto_df)}", "{len(msp_hfto_df)/len(msp_df)*100:.1f} %", "{len(np_hfto_df)}", "{len(np_hfto_df)/len(np_df)*100:.1f} %"
+    "low_frequency_turn_over_power_law", "{len(lfto_df)}", "{len(lfto_df)/len(df)*100:.1f} %", "{len(msp_lfto_df)}", "{len(msp_lfto_df)/len(msp_df)*100:.1f} %", "{len(np_lfto_df)}", "{len(np_lfto_df)/len(np_df)*100:.1f} %"
+    "double_turn_over_spectrum",         "{len(dtos_df)}", "{len(dtos_df)/len(df)*100:.1f} %", "{len(msp_dtos_df)}", "{len(msp_dtos_df)/len(msp_df)*100:.1f} %", "{len(np_dtos_df)}", "{len(np_dtos_df)/len(np_df)*100:.1f} %"
+    "Total",                             "{len(df)}",      "{len(df)     /len(df)*100:.1f} %", "{len(msp_df)}",      "{len(msp_df)     /len(msp_df)*100:.1f} %",      "{len(np_df)}", "{len(np_df)     /len(np_df)*100:.1f} %"
 
 Analysis Summary
 ----------------
 .. csv-table::
-   :header: "Parameter", "All Mean", "MSP Mean", "Normal Mean"
+    :header: "Parameter", "All Mean", "MSP Mean", "Normal Mean"
 
-   "spectral index",          "{df["a"].mean():.2f}±{df["a"].std():.2f}",                 "{msp_df["a"].mean():.2f}±{msp_df["a"].std():.2f}",                 "{np_df["a"].mean():.2f}±{np_df["a"].std():.2f}"
-   "Peak Frequency (GHz)",    "{df["vpeak"].mean()/1e9:.2f}±{df["vpeak"].std()/1e9:.2f}", "{msp_df["vpeak"].mean()/1e9:.2f}±{msp_df["vpeak"].std()/1e9:.2f}", "{np_df["vpeak"].mean()/1e9:.2f}±{np_df["vpeak"].std()/1e9:.2f}"
-   "Cut off frequency (GHz)", "{df["vc"].mean()/1e9:.2f}±{df["vc"].std()/1e9:.2f}",       "{msp_df["vc"].mean()/1e9:.2f}±{msp_df["vc"].std()/1e9:.2f}",       "{np_df["vc"].mean()/1e9:.2f}±{np_df["vc"].std()/1e9:.2f}"
-   "Beta",                    "{df["beta"].mean():.2f}±{df["beta"].std():.2f}",           "{msp_df["beta"].mean():.2f}±{msp_df["beta"].std():.2f}",           "{np_df["beta"].mean():.2f}±{np_df["beta"].std():.2f}"
-
-Spectral Index Mean Summary
-----------------------
-.. csv-table::
-   :header: "Model", "All Mean", "MSP Mean", "Normal Mean"
-
-   "simple_power_law",                  "{spl_df["a"].mean():.2f}±{spl_df["a"].std():.2f}",   "{msp_spl_df["a"].mean():.2f}±{ msp_spl_df["a"].std():.2f}",  "{np_spl_df["a"].mean():.2f}±{ np_spl_df["a"].std():.2f}"
-   "high_frequency_cut_off_power_law",  "{hfto_df["a"].mean():.2f}±{hfto_df["a"].std():.2f}", "{msp_hfto_df["a"].mean():.2f}±{msp_hfto_df["a"].std():.2f}", "{np_hfto_df["a"].mean():.2f}±{np_hfto_df["a"].std():.2f}"
-   "low_frequency_turn_over_power_law", "{lfto_df["a"].mean():.2f}±{lfto_df["a"].std():.2f}", "{msp_lfto_df["a"].mean():.2f}±{msp_lfto_df["a"].std():.2f}", "{np_lfto_df["a"].mean():.2f}±{np_lfto_df["a"].std():.2f}"
-   "double_turn_over_spectrum",         "{dtos_df["a"].mean():.2f}±{dtos_df["a"].std():.2f}", "{msp_dtos_df["a"].mean():.2f}±{msp_dtos_df["a"].std():.2f}", "{np_dtos_df["a"].mean():.2f}±{np_dtos_df["a"].std():.2f}"
-   "Total",                             "{df["a"].mean():.2f}±{df["a"].std():.2f}",           "{msp_df["a"].mean():.2f}±{     msp_df["a"].std():.2f}",      "{np_df["a"].mean():.2f}±{     np_df["a"].std():.2f}"
-
-Spectral Index Median Summary
-----------------------
-.. csv-table::
-   :header: "Model", "All Median", "MSP Median", "Normal Median"
-
-   "simple_power_law",                  "{spl_df["a"].median():.2f}±{spl_df["a"].std():.2f}",   "{msp_spl_df["a"].median():.2f}±{ msp_spl_df["a"].std():.2f}",  "{np_spl_df["a"].median():.2f}±{ np_spl_df["a"].std():.2f}"
-   "high_frequency_cut_off_power_law",  "{hfto_df["a"].median():.2f}±{hfto_df["a"].std():.2f}", "{msp_hfto_df["a"].median():.2f}±{msp_hfto_df["a"].std():.2f}", "{np_hfto_df["a"].median():.2f}±{np_hfto_df["a"].std():.2f}"
-   "low_frequency_turn_over_power_law", "{lfto_df["a"].median():.2f}±{lfto_df["a"].std():.2f}", "{msp_lfto_df["a"].median():.2f}±{msp_lfto_df["a"].std():.2f}", "{np_lfto_df["a"].median():.2f}±{np_lfto_df["a"].std():.2f}"
-   "double_turn_over_spectrum",         "{dtos_df["a"].median():.2f}±{dtos_df["a"].std():.2f}", "{msp_dtos_df["a"].median():.2f}±{msp_dtos_df["a"].std():.2f}", "{np_dtos_df["a"].median():.2f}±{np_dtos_df["a"].std():.2f}"
-   "Total",                             "{df["a"].median():.2f}±{df["a"].std():.2f}",           "{msp_df["a"].median():.2f}±{     msp_df["a"].std():.2f}",      "{np_df["a"].median():.2f}±{     np_df["a"].std():.2f}"
+    "spectral index",          "{df["a"].mean():.2f}±{df["a"].std():.2f}",                 "{msp_df["a"].mean():.2f}±{msp_df["a"].std():.2f}",                 "{np_df["a"].mean():.2f}±{np_df["a"].std():.2f}"
+    "Peak Frequency (GHz)",    "{df["vpeak"].mean()/1e9:.2f}±{df["vpeak"].std()/1e9:.2f}", "{msp_df["vpeak"].mean()/1e9:.2f}±{msp_df["vpeak"].std()/1e9:.2f}", "{np_df["vpeak"].mean()/1e9:.2f}±{np_df["vpeak"].std()/1e9:.2f}"
+    "Cut off frequency (GHz)", "{df["vc"].mean()/1e9:.2f}±{df["vc"].std()/1e9:.2f}",       "{msp_df["vc"].mean()/1e9:.2f}±{msp_df["vc"].std()/1e9:.2f}",       "{np_df["vc"].mean()/1e9:.2f}±{np_df["vc"].std()/1e9:.2f}"
+    "Beta",                    "{df["beta"].mean():.2f}±{df["beta"].std():.2f}",           "{msp_df["beta"].mean():.2f}±{msp_df["beta"].std():.2f}",           "{np_df["beta"].mean():.2f}±{np_df["beta"].std():.2f}"
 
 Single Power Law Results
 ------------------------
 .. csv-table::
-   :header: "Pulsar", "a"
+    :header: "Pulsar", "a"
 
 ''')
     for index, row in spl_df.iterrows():
@@ -172,7 +165,7 @@ Single Power Law Results
 Broken Power Law Results
 ------------------------
 .. csv-table::
-   :header: "Pulsar", "vb (MHz)", "a1", "a2"
+    :header: "Pulsar", "vb (MHz)", "a1", "a2"
 
 ''')
     for index, row in bpl_df.iterrows():
@@ -190,7 +183,7 @@ Broken Power Law Results
 Low Frequency Turn Over Results
 -------------------------------
 .. csv-table::
-   :header: "Pulsar", "vpeak (MHz)", "a", "beta"
+    :header: "Pulsar", "vpeak (MHz)", "a", "beta"
 
 ''')
     for index, row in lfto_df.iterrows():
@@ -208,7 +201,7 @@ Low Frequency Turn Over Results
 High Frequency Cut Off Results
 ------------------------------
 .. csv-table::
-   :header: "Pulsar", "vc (MHz)", "a"
+    :header: "Pulsar", "vc (MHz)", "a"
 
 ''')
     for index, row in hfto_df.iterrows():
@@ -226,7 +219,7 @@ High Frequency Cut Off Results
 Double Turn Over Spectrum Results
 ---------------------------------
 .. csv-table::
-   :header: "Pulsar", "vc (MHz)", "vpeak (MHz)", "a", "beta"
+    :header: "Pulsar", "vc (MHz)", "vpeak (MHz)", "a", "beta"
 
 ''')
     for index, row in dtos_df.iterrows():
@@ -238,20 +231,21 @@ Double Turn Over Spectrum Results
                 data_str += f'"{row[val]:.2f}±{row[error]:.2f}", '
         file.write(f'{data_str[:-2]}\n')
 
-    file.write(f'''
+#     file.write(f'''
 
 
-No Model Results
-----------------
-.. csv-table::
-   :header: "Pulsar", "N data"
+# No Model Results
+# ----------------
+# .. csv-table::
+#     :header: "Pulsar", "N data"
 
-''')
-    for index, row in nomod_df.iterrows():
-        file.write(f'   ":ref:`{row["Pulsar"]}`", "{row["N data flux"]}"')
+# ''')
+#     for index, row in nomod_df.iterrows():
+#         file.write(f'   ":ref:`{row["Pulsar"]}`", "{row["N data flux"]}"')
 
 
 # Set up the gallerys
+# -----------------------------------------------------------------------------
 with open(f'{os.path.dirname(os.path.realpath(__file__))}/docs/spl_gallery.rst', 'w') as file:
     file.write(f'''
 Simple Power Law Gallery
@@ -266,7 +260,7 @@ Simple Power Law Gallery
 {row["Pulsar"]}
 {"-"*len(row["Pulsar"])}
 .. image:: best_fits/{row["Pulsar"]}_fit.png
-  :width: 800
+    :width: 800
 ''')
 
 with open(f'{os.path.dirname(os.path.realpath(__file__))}/docs/bpl_gallery.rst', 'w') as file:
@@ -283,7 +277,7 @@ Broken Power Law Gallery
 {row["Pulsar"]}
 {"-"*len(row["Pulsar"])}
 .. image:: best_fits/{row["Pulsar"]}_fit.png
-  :width: 800
+    :width: 800
 ''')
 
 with open(f'{os.path.dirname(os.path.realpath(__file__))}/docs/lfto_gallery.rst', 'w') as file:
@@ -300,7 +294,7 @@ Low Frequency Turn Over Gallery
 {row["Pulsar"]}
 {"-"*len(row["Pulsar"])}
 .. image:: best_fits/{row["Pulsar"]}_fit.png
-  :width: 800
+    :width: 800
 ''')
 
 with open(f'{os.path.dirname(os.path.realpath(__file__))}/docs/hfco_gallery.rst', 'w') as file:
@@ -317,7 +311,7 @@ High Frequency Cut Off Gallery
 {row["Pulsar"]}
 {"-"*len(row["Pulsar"])}
 .. image:: best_fits/{row["Pulsar"]}_fit.png
-  :width: 800
+    :width: 800
 ''')
 
 with open(f'{os.path.dirname(os.path.realpath(__file__))}/docs/dtos_gallery.rst', 'w') as file:
@@ -334,7 +328,7 @@ Double Turn Over Spectrum Gallery
 {row["Pulsar"]}
 {"-"*len(row["Pulsar"])}
 .. image:: best_fits/{row["Pulsar"]}_fit.png
-  :width: 800
+    :width: 800
 ''')
 
 with open(f'{os.path.dirname(os.path.realpath(__file__))}/docs/smart_gallery.rst', 'w') as file:
@@ -348,12 +342,10 @@ All pulsar detections from the SMART pulsar survey (these will be in other galle
     for index, row in smart_df.iterrows():
         file.write(f'''
 
-.. _{row["Pulsar"]}:
-
 {row["Pulsar"]}
 {"-"*len(row["Pulsar"])}
 .. image:: best_fits/{row["Pulsar"]}_fit.png
-  :width: 800
+    :width: 800
 ''')
 
 
@@ -368,12 +360,10 @@ All millisecond pulsar detections (these will be in other galleries).
     for index, row in msp_df.iterrows():
         file.write(f'''
 
-.. _{row["Pulsar"]}:
-
 {row["Pulsar"]}
 {"-"*len(row["Pulsar"])}
 .. image:: best_fits/{row["Pulsar"]}_fit.png
-  :width: 800
+    :width: 800
 ''')
 
 
@@ -427,7 +417,7 @@ titles = [
     'Low-frequency turn over',
     'Double turn over spectrum',
 ]
-make_histogram_plots(all_indexs, hist_range, label=["spl", "hfto", "lfto", "dtos"], titles=titles, plotname="spectral_index_histogram.png", xlabel="\\alpha")
+make_histogram_plots(all_indexs, hist_range, label=["spl", "hfto", "lfto", "dtos"], titles=titles, plotname="docs/histograms/spectral_index_histogram.png", xlabel="\\alpha")
 
 
 # Vc histogram
@@ -441,23 +431,22 @@ titles = [
     'High-frequency cut off',
     'Double turn over spectrum',
 ]
-make_histogram_plots(all_indexs, hist_range, label=["hfto", "dtos"], titles=titles, plotname="vc_histogram.png", xlabel="\\nu_c")
+make_histogram_plots(all_indexs, hist_range, label=["hfto", "dtos"], titles=titles, plotname="docs/histograms/vc_histogram.png", xlabel="\\nu_c")
 # Redo with just high frequency trun over
-fig, ax = plt.subplots()
-ax.hist(np.log10(hfto_df["vc"]), 20, histtype='bar', color='blue')
-ax.xaxis.set_major_formatter(
-    FuncFormatter(lambda x, _:
-        f'{10**x/1e9:.1f}'
-    )
-)
-ax.set_xlabel(f"High-frequency cut off frequency (GHz)")
-ax.set_ylabel(f"#")
-fig.tight_layout()
-fig.savefig("vc_histogram_just_hfto.png")
-plt.close(fig)
+# fig, ax = plt.subplots()
+# ax.hist(np.log10(hfto_df["vc"]), 20, histtype='bar', color='blue')
+# ax.xaxis.set_major_formatter(
+#     FuncFormatter(lambda x, _:
+#         f'{10**x/1e9:.1f}'
+#     )
+# )
+# ax.set_xlabel(f"High-frequency cut off frequency (GHz)")
+# ax.set_ylabel(f"#")
+# fig.tight_layout()
+# fig.savefig("docs/histograms/vc_histogram_just_hfto.png")
+# plt.close(fig)
 
 # Vpeak histogram
-n_bins = 20
 hist_range = (np.log10(df["vpeak"].min()), np.log10(df["vpeak"].max()))
 
 all_indexs = np.array([
@@ -469,7 +458,7 @@ titles = [
     'Low-frequency turn over',
     'Double turn over spectrum',
 ]
-make_histogram_plots(all_indexs, hist_range, label=["lfto", "dtos"], titles=titles, plotname="vpeak_histogram.png", xlabel="\\nu_{peak}")
+make_histogram_plots(all_indexs, hist_range, label=["lfto", "dtos"], titles=titles, plotname="docs/histograms/vpeak_histogram.png", xlabel="\\nu_{peak}")
 
 
 log_df = df#[df["beta"] < 2.05]
@@ -496,17 +485,17 @@ def spearmanr_ci(x, y, alpha=0.05):
     Parameters
     ----------
     x, y : iterable object such as a list or np.array
-      Input for correlation calculation
+        Input for correlation calculation
     alpha : float
-      Significance level. 0.05 by default
+        Significance level. 0.05 by default
     Returns
     -------
     r : float
-      Pearson's correlation coefficient
+        Pearson's correlation coefficient
     pval : float
-      The corresponding p value
+        The corresponding p value
     lo, hi : float
-      The lower and upper bound of confidence intervals
+        The lower and upper bound of confidence intervals
     """
 
     r, p = stats.spearmanr(x, y, nan_policy="omit")
@@ -626,9 +615,9 @@ def plot_correlations(
     # Calculate spearman correlation coefficient
     rho, pval, lo, hi = spearmanr_ci(x, y)
     if abs(rho) >= 0.4 and pval < 0.01/105:
-        weights_str = f"{{\\bf {rho:.2f}}} ({pval:.1e}, {len(x)})"
+        weights_str = f"{{\\bf {rho:5.2f}}} ({pval:.1e}, {len(x):3d})"
     else:
-        weights_str = f"{rho:.2f} ({pval:.1e}, {len(x)})"
+        weights_str = f"{rho:5.2f} ({pval:.1e}, {len(x):3d})"
 
     if lax is not None:
         f, ax = plt.subplots()
@@ -754,7 +743,7 @@ def plot_correlations(
         ax.tick_params(which='both', direction='in', top=1, right=1)
         lax.tick_params(which='both', direction='in', top=1, right=1)
         f.tight_layout()
-        f.savefig(f'corr_plots/corr_line_{ycol}_{xcol.replace("/", "_")}_{label}.png'.replace(" ", "_"), dpi=300)
+        f.savefig(f'docs/correlations/corr_line_{ycol}_{xcol.replace("/", "_")}_{label}.png'.replace(" ", "_"), dpi=300)
         plt.close(f)
     return weights_str
 
@@ -788,12 +777,12 @@ ycols = [
 ]
 
 math_names_x = {
-    "ATNF Period (s) log": "P (s)",
-    "ATNF Pdot log": "$\dot{P}$ (s s$^{-1}$)",
+    #"ATNF Period (s) log": "P (s)",
     "ATNF Spin Frequency (Hz) log": "$\\tilde{\\nu}$ (GHz)",
-    "ATNF Fdot log": "$\left| \dot{\\tilde{\\nu}} \\right|$ ",
+    "ATNF Pdot log": "$\dot{P}$ (s s$^{-1}$)",
+    "ATNF Fdot log": "$\left| \dot{\\tilde{\\nu}} \\right|$ (s$^{-2}$)",
     "ATNF DM log": "DM (pc cm$^{-3}$)",
-    "ATNF B_surf (G) log": "$B_{surf}$ (G)",
+    #"ATNF B_surf (G) log": "$B_{surf}$ (G)",
     "ATNF B_LC (G) log": "$B_{LC}$ (G)",
     "ATNF E_dot (ergs/s) log": "$\dot{E}$ (ergs/s)",
     "L400 (mJy kpc^2) log": "$L_{400}$ (mJy kpc$^2$)",
@@ -805,6 +794,13 @@ math_names_y = {
         "vpeak log": "$\\nu_{peak}$ (GHz)",
         "vc log": "$\\nu_c$ (GHz)",
 }
+
+correlation_tables = {
+    "a": [],
+    "vpeak log": [],
+    "vc log": [],
+}
+
 nx = len(xcols)
 ny = len(ycols)
 # Make figures and axis for each pulsar type
@@ -837,6 +833,14 @@ for ya, ycol in enumerate(ycols):
     print("$log_{10}(x)$ & $r_s (p, N)$ & $r_s (p, N)$ & $r_s (p, N)$ & $r_s (p, N)$ & $r_s (p, N)$ \\\\")
     # print("$log_{10}(x)$ & $r_s$ & $r_s$ & $r_s$ & $r_s$ & $r_s$ \\\\")
     print("\hline")
+    # Record table for sphinx output
+    correlation_tables[ycol].append(f'+------------------------------------------+--------------------------+--------------------------+--------------------------+--------------------------+--------------------------+')
+    correlation_tables[ycol].append(f'|                                      set |                      all |                in binary |                 isolated |                      MSP |                     slow |')
+    correlation_tables[ycol].append(f'+------------------------------------------+--------------------------+--------------------------+--------------------------+--------------------------+--------------------------+')
+    correlation_tables[ycol].append(f'|                                 #pulsars |                      {len(ycol_df):3d} |                      {nbinary:3d} |                      {nisolated:3d} |                      {nmsp:3d} |                      {nslow:3d} |')
+    correlation_tables[ycol].append(f'+------------------------------------------+--------------------------+--------------------------+--------------------------+--------------------------+--------------------------+')
+    correlation_tables[ycol].append(f'|                :math:`{{\\bf log_{{10}}(x)}}` | :math:`{{\\bf r_s (p, N)}}` | :math:`{{\\bf r_s (p, N)}}` | :math:`{{\\bf r_s (p, N)}}` | :math:`{{\\bf r_s (p, N)}}` | :math:`{{\\bf r_s (p, N)}}` |')
+    correlation_tables[ycol].append(f'+==========================================+==========================+==========================+==========================+==========================+==========================+')
 
     # Loop over pulsar paramters
     for xa, xcol in enumerate(xcols):
@@ -898,18 +902,170 @@ for ya, ycol in enumerate(ycols):
 
         # Output latex results
         print(f'{math_names_x[xcol].split("(")[0]} & {" & ".join(sub_weights)} \\\\')
+        # Replace latex bold with sphinx bold
+        sphinx_weights = []
+        for weight in sub_weights:
+            if 'bf' in weight:
+                new_weight = weight.replace('{\\bf ', '').replace('}', '')
+                if new_weight.startswith(" "):
+                    sphinx_weights.append(f" **{new_weight[1:]}**")
+                else:
+                    sphinx_weights.append(f"**{new_weight}**")
+            else:
+                sphinx_weights.append(f"  {weight}  ")
+        mathed_name = f':math:`{math_names_x[xcol].split(" (")[0].replace("$", "")}`'
+        correlation_tables[ycol].append(f'| {" " * (40 - len(mathed_name))}{mathed_name} | {" | ".join(sphinx_weights)} |')
+        correlation_tables[ycol].append(f'+------------------------------------------+--------------------------+--------------------------+--------------------------+--------------------------+--------------------------+')
     print("\hline")
+    # correlation_tables[ycol].append(f'+------------------------------------------+--------------------------+--------------------------+--------------------------+--------------------------+--------------------------+')
+    print("\n".join(correlation_tables[ycol]))
 
 # Save plots
 sfig.tight_layout()
-sfig.savefig(f'corr_plots/coor_all.png',          dpi=300)
+sfig.savefig(f'docs/correlations/coor_all.png',          dpi=300)
 lfig.tight_layout()
-lfig.savefig(f'corr_plots/corr_all_weighted.png', dpi=300)
+lfig.savefig(f'docs/correlations/corr_all_weighted.png', dpi=300)
 bfig.tight_layout()
-bfig.savefig(f'corr_plots/corr_b_weighted.png',   dpi=300)
+bfig.savefig(f'docs/correlations/corr_b_weighted.png',   dpi=300)
 ifig.tight_layout()
-ifig.savefig(f'corr_plots/corr_i_weighted.png',   dpi=300)
+ifig.savefig(f'docs/correlations/corr_i_weighted.png',   dpi=300)
 mfig.tight_layout()
-mfig.savefig(f'corr_plots/corr_m_weighted.png',   dpi=300)
+mfig.savefig(f'docs/correlations/corr_m_weighted.png',   dpi=300)
 sfig.tight_layout()
-sfig.savefig(f'corr_plots/corr_s_weighted.png',   dpi=300)
+sfig.savefig(f'docs/correlations/corr_s_weighted.png',   dpi=300)
+
+pulsar_types = [
+    'All Pulsars',
+    'Only Binary Pulsars',
+    'Only Isolated Pulsars',
+    'Only MSPs',
+    'Only Slow Pulsars',
+]
+
+# Set up the spectral property summaries
+# -----------------------------------------------------------------------------
+# Spectral index
+with open(f'{os.path.dirname(os.path.realpath(__file__))}/docs/spectral_index_summary.rst', 'w') as file:
+    file.write(f'''
+Spectral Index Summary
+======================
+
+''')
+    for line in correlation_tables["a"]:
+        file.write(f"{line}\n")
+
+    file.write(f'''
+
+Spectral Index Mean Summary
+---------------------------
+.. csv-table::
+    :header: "Model", "All Mean", "MSP Mean", "Normal Mean"
+
+    "simple_power_law",                  "{spl_df["a"].mean():.2f}±{spl_df["a"].std():.2f}",   "{msp_spl_df["a"].mean():.2f}±{ msp_spl_df["a"].std():.2f}",  "{np_spl_df["a"].mean():.2f}±{ np_spl_df["a"].std():.2f}"
+    "high_frequency_cut_off_power_law",  "{hfto_df["a"].mean():.2f}±{hfto_df["a"].std():.2f}", "{msp_hfto_df["a"].mean():.2f}±{msp_hfto_df["a"].std():.2f}", "{np_hfto_df["a"].mean():.2f}±{np_hfto_df["a"].std():.2f}"
+    "low_frequency_turn_over_power_law", "{lfto_df["a"].mean():.2f}±{lfto_df["a"].std():.2f}", "{msp_lfto_df["a"].mean():.2f}±{msp_lfto_df["a"].std():.2f}", "{np_lfto_df["a"].mean():.2f}±{np_lfto_df["a"].std():.2f}"
+    "double_turn_over_spectrum",         "{dtos_df["a"].mean():.2f}±{dtos_df["a"].std():.2f}", "{msp_dtos_df["a"].mean():.2f}±{msp_dtos_df["a"].std():.2f}", "{np_dtos_df["a"].mean():.2f}±{np_dtos_df["a"].std():.2f}"
+    "Total",                             "{df["a"].mean():.2f}±{df["a"].std():.2f}",           "{msp_df["a"].mean():.2f}±{     msp_df["a"].std():.2f}",      "{np_df["a"].mean():.2f}±{     np_df["a"].std():.2f}"
+
+Spectral Index Median Summary
+-----------------------------
+.. csv-table::
+    :header: "Model", "All Median", "MSP Median", "Normal Median"
+
+    "simple_power_law",                  "{spl_df["a"].median():.2f}±{spl_df["a"].std():.2f}",   "{msp_spl_df["a"].median():.2f}±{ msp_spl_df["a"].std():.2f}",  "{np_spl_df["a"].median():.2f}±{ np_spl_df["a"].std():.2f}"
+    "high_frequency_cut_off_power_law",  "{hfto_df["a"].median():.2f}±{hfto_df["a"].std():.2f}", "{msp_hfto_df["a"].median():.2f}±{msp_hfto_df["a"].std():.2f}", "{np_hfto_df["a"].median():.2f}±{np_hfto_df["a"].std():.2f}"
+    "low_frequency_turn_over_power_law", "{lfto_df["a"].median():.2f}±{lfto_df["a"].std():.2f}", "{msp_lfto_df["a"].median():.2f}±{msp_lfto_df["a"].std():.2f}", "{np_lfto_df["a"].median():.2f}±{np_lfto_df["a"].std():.2f}"
+    "double_turn_over_spectrum",         "{dtos_df["a"].median():.2f}±{dtos_df["a"].std():.2f}", "{msp_dtos_df["a"].median():.2f}±{msp_dtos_df["a"].std():.2f}", "{np_dtos_df["a"].median():.2f}±{np_dtos_df["a"].std():.2f}"
+    "Total",                             "{df["a"].median():.2f}±{df["a"].std():.2f}",           "{msp_df["a"].median():.2f}±{     msp_df["a"].std():.2f}",      "{np_df["a"].median():.2f}±{     np_df["a"].std():.2f}"
+
+Spectral Index Histogram
+------------------------
+
+.. image:: histograms/spectral_index_histogram.png
+    :width: 800
+
+''')
+    for pulsar_param in math_names_x.keys():
+        file.write(f'''
+:math:`{math_names_x[pulsar_param].replace("$", "").split(" (")[0]}` Correlations
+{(len(math_names_x[pulsar_param].replace("$", "").split(" (")[0]) + 21) * "-"}
+
+''')
+        for pulsar_type in pulsar_types:
+            file.write(f'''
+{pulsar_type}
+{len(pulsar_type) * "^"}
+
+.. image:: correlations/corr_line_a_{pulsar_param.replace(" ", "_").replace("/", "_")}_{pulsar_type.replace(" ", "_")}.png
+    :width: 800
+''')
+
+# vpeak
+with open(f'{os.path.dirname(os.path.realpath(__file__))}/docs/vpeak_summary.rst', 'w') as file:
+    file.write(f'''
+:math:`\\nu_{{peak}}` Summary
+==========================
+
+''')
+    for line in correlation_tables["vpeak log"]:
+        file.write(f"{line}\n")
+
+    file.write(f'''
+
+:math:`\\nu_{{peak}}` Histogram
+----------------------------
+
+.. image:: histograms/vpeak_histogram.png
+    :width: 800
+
+''')
+    for pulsar_param in math_names_x.keys():
+        file.write(f'''
+:math:`{math_names_x[pulsar_param].replace("$", "").split(" (")[0]}` Correlations
+{(len(math_names_x[pulsar_param].replace("$", "").split(" (")[0]) + 21) * "-"}
+
+''')
+        for pulsar_type in pulsar_types:
+            file.write(f'''
+{pulsar_type}
+{len(pulsar_type) * "^"}
+
+.. image:: correlations/corr_line_vpeak_log_{pulsar_param.replace(" ", "_").replace("/", "_")}_{pulsar_type.replace(" ", "_")}.png
+    :width: 800
+''')
+
+
+# v_c
+with open(f'{os.path.dirname(os.path.realpath(__file__))}/docs/vc_summary.rst', 'w') as file:
+    file.write(f'''
+:math:`\\nu_{{c}}` Summary
+=======================
+
+''')
+    for line in correlation_tables["vc log"]:
+        file.write(f"{line}\n")
+
+    file.write(f'''
+
+
+:math:`\\nu_{{c}}` Histogram
+-------------------------
+
+.. image:: histograms/vc_histogram.png
+    :width: 800
+
+''')
+    for pulsar_param in math_names_x.keys():
+        file.write(f'''
+:math:`{math_names_x[pulsar_param].replace("$", "").split(" (")[0]}` Correlations
+{(len(math_names_x[pulsar_param].replace("$", "").split(" (")[0]) + 21) * "-"}
+
+''')
+        for pulsar_type in pulsar_types:
+            file.write(f'''
+{pulsar_type}
+{len(pulsar_type) * "^"}
+
+.. image:: correlations/corr_line_vc_log_{pulsar_param.replace(" ", "_").replace("/", "_")}_{pulsar_type.replace(" ", "_")}.png
+    :width: 800
+''')

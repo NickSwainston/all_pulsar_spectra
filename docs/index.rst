@@ -2,73 +2,65 @@
 Pulsar Spectra all pulsars fit results
 ======================================
 
-.. toctree::
-   :maxdepth: 1
-   :caption: Spectral Model Gallerys:
-
-   spl_gallery
-   bpl_gallery
-   lfto_gallery
-   hfco_gallery
-   dtos_gallery
-
+The following is the result of fitting all pulsars with more than four flux density measurements in version
+2.0.1 of pulsar_spectra. If using any of the data, please cite `Swainston et al. (2022) <https://ui.adsabs.harvard.edu/abs/2022PASA...39...56S/abstract>`_
+and `Nicholas Swainston's thesis <https://catalogue.curtin.edu.au/discovery/search?vid=61CUR_INST:CUR_ALMA>`_ (link will be updated once it is published).
+Chapter 6 of the thesis analyised version 2.0.0.
 
 .. toctree::
-   :maxdepth: 1
-   :caption: Other Gallerys:
+    :maxdepth: 1
+    :caption: Spectral Fit Summaries:
 
-   smart_gallery
-   msp_gallery
+    spectral_index_summary
+    vpeak_summary
+    vc_summary
+
+
+.. toctree::
+    :maxdepth: 1
+    :caption: Spectral Model Gallerys:
+
+    spl_gallery
+    bpl_gallery
+    lfto_gallery
+    hfco_gallery
+    dtos_gallery
+
+
+.. toctree::
+    :maxdepth: 1
+    :caption: Other Gallerys:
+
+    smart_gallery
+    msp_gallery
 
 
 Fit Summary Pulsar Count
 ------------------------
 .. csv-table::
-   :header: "Model", "Total", "%", "MSP", "%", "Normal", "%"
+    :header: "Model", "Total", "%", "MSP", "%", "Normal", "%"
 
-   "simple_power_law",                  "611",  "68.4 %",  "53",  "61.6 %",  "558", "69.1 %"
-   "broken_power_law",                  "54",  "6.0 %",  "7",  "8.1 %",  "47", "5.8 %"
-   "high_frequency_cut_off_power_law",  "107", "12.0 %", "8", "9.3 %", "99", "12.3 %"
-   "low_frequency_turn_over_power_law", "105", "11.8 %", "12", "14.0 %", "93", "11.5 %"
-   "double_turn_over_spectrum",         "16", "1.8 %", "6", "7.0 %", "10", "1.2 %"
-   "Total",                             "893",      "100.0 %", "86",      "100.0 %",      "807", "100.0 %"
+    "simple_power_law",                  "611",  "68.4 %",  "53",  "61.6 %",  "558", "69.1 %"
+    "broken_power_law",                  "54",  "6.0 %",  "7",  "8.1 %",  "47", "5.8 %"
+    "high_frequency_cut_off_power_law",  "107", "12.0 %", "8", "9.3 %", "99", "12.3 %"
+    "low_frequency_turn_over_power_law", "105", "11.8 %", "12", "14.0 %", "93", "11.5 %"
+    "double_turn_over_spectrum",         "16", "1.8 %", "6", "7.0 %", "10", "1.2 %"
+    "Total",                             "893",      "100.0 %", "86",      "100.0 %",      "807", "100.0 %"
 
 Analysis Summary
 ----------------
 .. csv-table::
-   :header: "Parameter", "All Mean", "MSP Mean", "Normal Mean"
+    :header: "Parameter", "All Mean", "MSP Mean", "Normal Mean"
 
-   "spectral index",          "-1.77±1.37",                 "-2.30±1.92",                 "-1.71±1.29"
-   "Peak Frequency (GHz)",    "0.32±0.32", "0.34±0.27", "0.31±0.33"
-   "Cut off frequency (GHz)", "7.64±19.81",       "16.62±19.05",       "6.48±19.69"
-   "Beta",                    "1.34±0.76",           "1.17±0.86",           "1.37±0.74"
-
-Spectral Index Mean Summary
-----------------------
-.. csv-table::
-   :header: "Model", "All Mean", "MSP Mean", "Normal Mean"
-
-   "simple_power_law",                  "-1.61±0.87",   "-1.69±0.76",  "-1.61±0.87"
-   "high_frequency_cut_off_power_law",  "-0.68±0.52", "-0.91±0.86", "-0.67±0.49"
-   "low_frequency_turn_over_power_law", "-3.44±2.23", "-5.34±2.67", "-3.20±2.06"
-   "double_turn_over_spectrum",         "-3.84±2.17", "-3.44±2.01", "-4.08±2.34"
-   "Total",                             "-1.77±1.37",           "-2.30±1.92",      "-1.71±1.29"
-
-Spectral Index Median Summary
-----------------------
-.. csv-table::
-   :header: "Model", "All Median", "MSP Median", "Normal Median"
-
-   "simple_power_law",                  "-1.61±0.87",   "-1.69±0.76",  "-1.60±0.87"
-   "high_frequency_cut_off_power_law",  "-0.65±0.52", "-1.07±0.86", "-0.64±0.49"
-   "low_frequency_turn_over_power_law", "-2.43±2.23", "-6.17±2.67", "-2.40±2.06"
-   "double_turn_over_spectrum",         "-3.07±2.17", "-2.97±2.01", "-3.28±2.34"
-   "Total",                             "-1.61±1.37",           "-1.74±1.92",      "-1.58±1.29"
+    "spectral index",          "-1.77±1.37",                 "-2.30±1.92",                 "-1.71±1.29"
+    "Peak Frequency (GHz)",    "0.32±0.32", "0.34±0.27", "0.31±0.33"
+    "Cut off frequency (GHz)", "7.64±19.81",       "16.62±19.05",       "6.48±19.69"
+    "Beta",                    "1.34±0.76",           "1.17±0.86",           "1.37±0.74"
 
 Single Power Law Results
 ------------------------
 .. csv-table::
-   :header: "Pulsar", "a"
+    :header: "Pulsar", "a"
 
    ":ref:`J0014+4746`", "-1.03±0.68"
    ":ref:`J0026+6320`", "-1.13±0.31"
@@ -687,7 +679,7 @@ Single Power Law Results
 Broken Power Law Results
 ------------------------
 .. csv-table::
-   :header: "Pulsar", "vb (MHz)", "a1", "a2"
+    :header: "Pulsar", "vb (MHz)", "a1", "a2"
 
    ":ref:`J0139+5814`", "349±0", "-1.83±0.12", "-1.29±0.12"
    ":ref:`J0147+5922`", "690±175", "-1.52±0.13", "-0.57±0.12"
@@ -749,7 +741,7 @@ Broken Power Law Results
 Low Frequency Turn Over Results
 -------------------------------
 .. csv-table::
-   :header: "Pulsar", "vpeak (MHz)", "a", "beta"
+    :header: "Pulsar", "vpeak (MHz)", "a", "beta"
 
    ":ref:`J0024-7204C`", "600±8", "-8.00±5.37", "0.38±0.00"
    ":ref:`J0024-7204J`", "607±4", "-8.00±0.34", "2.10±0.08"
@@ -862,7 +854,7 @@ Low Frequency Turn Over Results
 High Frequency Cut Off Results
 ------------------------------
 .. csv-table::
-   :header: "Pulsar", "vc (MHz)", "a"
+    :header: "Pulsar", "vc (MHz)", "a"
 
    ":ref:`J0108+6608`", "2184±640", "-1.15±0.20"
    ":ref:`J0206-4028`", "1754±504", "-1.13±0.51"
@@ -977,7 +969,7 @@ High Frequency Cut Off Results
 Double Turn Over Spectrum Results
 ---------------------------------
 .. csv-table::
-   :header: "Pulsar", "vc (MHz)", "vpeak (MHz)", "a", "beta"
+    :header: "Pulsar", "vc (MHz)", "vpeak (MHz)", "a", "beta"
 
    ":ref:`J0024-7204D`", "4236±241", "699±34", "-6.68±0.06", "0.18±0.00"
    ":ref:`J0034-0534`", "16599±14923", "84±0", "-4.68±0.28", "1.30±0.09"
@@ -995,11 +987,3 @@ Double Turn Over Spectrum Results
    ":ref:`J1752-2806`", "186690±111532", "141±1", "-7.98±0.04", "0.26±0.00"
    ":ref:`J1939+2134`", "7838±422", "14±0", "-3.80±0.02", "0.14±0.00"
    ":ref:`J2145-0750`", "51239±46056", "108±5", "-1.72±0.07", "1.72±0.20"
-
-
-
-No Model Results
-----------------
-.. csv-table::
-   :header: "Pulsar", "N data"
-
