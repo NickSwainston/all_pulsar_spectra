@@ -380,11 +380,19 @@ def make_histogram_plots(all_data, hist_range, label, titles, plotname, xlabel):
         'orange',
         'purple',
     ]
+    characters = [
+        'a)',
+        'b)',
+        'c)',
+        'd)',
+        'e)'
+    ]
     n_data = len(all_data) + 1
 
     fig, axes = plt.subplots(nrows=n_data, figsize=(5, 3*n_data))
 
     axes[0].hist(all_data, n_bins, density=True, histtype='bar', stacked=True, label=label, color=colours[:n_data-1])
+    axes[0].text(0.1, 0.8, characters[0], transform=axes[0].transAxes, size=20)
     axes[0].set_title(titles[0])
     axes[0].legend(prop={'size': 10})
     axes[0].set_ylabel(f"Probability Density")
@@ -393,6 +401,7 @@ def make_histogram_plots(all_data, hist_range, label, titles, plotname, xlabel):
     for ai, df_col, colour, title in zip(range(1, n_data), all_data, colours, titles[1:]):
         #print(ai, n_data)
         axes[ai].hist(df_col, n_bins, histtype='bar', color=colour, range=hist_range)
+        axes[ai].text(0.1, 0.8, characters[ai], transform=axes[ai].transAxes, size=20)
         axes[ai].set_title(title)
         axes[ai].set_ylabel(f"#")
         axes[ai].set_xlabel(f"${xlabel}$")
@@ -413,11 +422,11 @@ hist_range = (min(df["a"]), max(df["a"]))
 titles = [
     'All models',
     'Simple power law',
-    'High-frequency cut off',
-    'Low-frequency turn over',
-    'Double turn over spectrum',
+    'High-frequency cut-off',
+    'Low-frequency turn-over',
+    'Double turn-over spectrum',
 ]
-make_histogram_plots(all_indexs, hist_range, label=["spl", "hfto", "lfto", "dtos"], titles=titles, plotname="docs/histograms/spectral_index_histogram.png", xlabel="\\alpha")
+make_histogram_plots(all_indexs, hist_range, label=["SPL", "HFCO", "LFTO", "DTOS"], titles=titles, plotname="docs/histograms/spectral_index_histogram.png", xlabel="\\alpha")
 
 
 # Vc histogram
@@ -428,10 +437,10 @@ all_indexs = np.array([
 ])
 titles = [
     'All models',
-    'High-frequency cut off',
-    'Double turn over spectrum',
+    'High-frequency cut-off',
+    'Double turn-over spectrum',
 ]
-make_histogram_plots(all_indexs, hist_range, label=["hfto", "dtos"], titles=titles, plotname="docs/histograms/vc_histogram.png", xlabel="\\nu_c")
+make_histogram_plots(all_indexs, hist_range, label=["HFCO", "DTOS"], titles=titles, plotname="docs/histograms/vc_histogram.png", xlabel="\\nu_c")
 # Redo with just high frequency trun over
 # fig, ax = plt.subplots()
 # ax.hist(np.log10(hfto_df["vc"]), 20, histtype='bar', color='blue')
@@ -455,10 +464,10 @@ all_indexs = np.array([
 ])
 titles = [
     'All models',
-    'Low-frequency turn over',
-    'Double turn over spectrum',
+    'Low-frequency turn-over',
+    'Double turn-over spectrum',
 ]
-make_histogram_plots(all_indexs, hist_range, label=["lfto", "dtos"], titles=titles, plotname="docs/histograms/vpeak_histogram.png", xlabel="\\nu_{peak}")
+make_histogram_plots(all_indexs, hist_range, label=["LFTO", "DTOS"], titles=titles, plotname="docs/histograms/vpeak_histogram.png", xlabel="\\nu_{peak}")
 
 
 log_df = df#[df["beta"] < 2.05]
