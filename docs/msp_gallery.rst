@@ -6,6 +6,12 @@ All millisecond pulsar detections (these will be in other galleries).
 
 
 
+J0023+0923
+----------
+.. image:: best_fits/J0023+0923_fit.png
+    :width: 800
+
+
 J0024-7204C
 -----------
 .. image:: best_fits/J0024-7204C_fit.png
@@ -63,6 +69,12 @@ J0407+1607
 J0437-4715
 ----------
 .. image:: best_fits/J0437-4715_fit.png
+    :width: 800
+
+
+J0514-4002A
+-----------
+.. image:: best_fits/J0514-4002A_fit.png
     :width: 800
 
 
@@ -180,6 +192,12 @@ J1300+1240
     :width: 800
 
 
+J1327-0755
+----------
+.. image:: best_fits/J1327-0755_fit.png
+    :width: 800
+
+
 J1400-1431
 ----------
 .. image:: best_fits/J1400-1431_fit.png
@@ -246,6 +264,12 @@ J1643-1224
     :width: 800
 
 
+J1709+2313
+----------
+.. image:: best_fits/J1709+2313_fit.png
+    :width: 800
+
+
 J1713+0747
 ----------
 .. image:: best_fits/J1713+0747_fit.png
@@ -258,9 +282,21 @@ J1730-2304
     :width: 800
 
 
+J1732-5049
+----------
+.. image:: best_fits/J1732-5049_fit.png
+    :width: 800
+
+
 J1738+0333
 ----------
 .. image:: best_fits/J1738+0333_fit.png
+    :width: 800
+
+
+J1741+1351
+----------
+.. image:: best_fits/J1741+1351_fit.png
     :width: 800
 
 
@@ -273,6 +309,12 @@ J1744-1134
 J1747-4036
 ----------
 .. image:: best_fits/J1747-4036_fit.png
+    :width: 800
+
+
+J1748-2446A
+-----------
+.. image:: best_fits/J1748-2446A_fit.png
     :width: 800
 
 
@@ -342,6 +384,12 @@ J1832-0836
     :width: 800
 
 
+J1843-1113
+----------
+.. image:: best_fits/J1843-1113_fit.png
+    :width: 800
+
+
 J1853+1303
 ----------
 .. image:: best_fits/J1853+1303_fit.png
@@ -369,6 +417,12 @@ J1909-3744
 J1910+1256
 ----------
 .. image:: best_fits/J1910+1256_fit.png
+    :width: 800
+
+
+J1911+1347
+----------
+.. image:: best_fits/J1911+1347_fit.png
     :width: 800
 
 
@@ -423,6 +477,12 @@ J2007+2722
 J2010-1323
 ----------
 .. image:: best_fits/J2010-1323_fit.png
+    :width: 800
+
+
+J2017+0603
+----------
+.. image:: best_fits/J2017+0603_fit.png
     :width: 800
 
 
@@ -489,6 +549,12 @@ J2229+2643
 J2234+0611
 ----------
 .. image:: best_fits/J2234+0611_fit.png
+    :width: 800
+
+
+J2234+0944
+----------
+.. image:: best_fits/J2234+0944_fit.png
     :width: 800
 
 

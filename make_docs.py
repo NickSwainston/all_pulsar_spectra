@@ -92,7 +92,7 @@ Pulsar Spectra all pulsars fit results
 The following is the result of fitting all pulsars with more than four flux density measurements in version
 of pulsar_spectra. If using any of the data, please cite `Swainston et al. (2022) <https://ui.adsabs.harvard.edu/abs/2022PASA...39...56S/abstract>`_
 and `Nicholas Swainston's thesis <https://catalogue.curtin.edu.au/discovery/search?vid=61CUR_INST:CUR_ALMA>`_ (link will be updated once it is published).
-Chapter 6 of the thesis analyised version 2.0.2.
+Chapter 6 of the thesis analyised version {pulsar_spectra.__version__}.
 
 .. toctree::
     :maxdepth: 1
@@ -476,7 +476,7 @@ Low Frequency Campaign
 
 The following {len(low_freq_camp)} pulsars had no flux density measurements below {min_freq_high} MHz and
 an estimated flux density of greater than {min_flux_low} mJy at both 150 or 300 MHz.
-The CSV file can be found `here <https://github.com/NickSwainston/all_pulsar_spectra/blob/2.0.2/low_freq_camp.csv>`_.
+The CSV file can be found `here <https://github.com/NickSwainston/all_pulsar_spectra/blob/{pulsar_spectra.__version__}/low_freq_camp.csv>`_.
 
 .. csv-table::
     :header: "Pulsar", "Model", "Min freq (MHz)", "S150 (mJy)", "S300 (mJy)"
@@ -498,7 +498,7 @@ High Frequency Campaign
 
 The following {len(high_freq_camp)} pulsars had no flux density measurements above {max_freq_low} MHz and
 an estimated flux density of greater than {min_flux_high} mJy both either 5 or 10 GHz.
-The CSV file can be found `here <https://github.com/NickSwainston/all_pulsar_spectra/blob/2.0.2/high_freq_camp.csv>`_.
+The CSV file can be found `here <https://github.com/NickSwainston/all_pulsar_spectra/blob/{pulsar_spectra.__version__}/high_freq_camp.csv>`_.
 
 .. csv-table::
     :header: "Pulsar", "Model", "Max freq (MHz)", "S5000 (mJy)", "S10000 (mJy)"
@@ -564,7 +564,7 @@ all_indexs = [
     lfto_df["a"],
     dtos_df["a"],
 ]
-hist_range = (min(df["a"]), max(df["a"]))
+hist_range = (df["a"].min(), df["a"].max())
 titles = [
     'All models',
     'Simple power law',

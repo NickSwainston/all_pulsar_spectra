@@ -24,6 +24,12 @@ J0034-0721
     :width: 800
 
 
+J0038-2501
+----------
+.. image:: best_fits/J0038-2501_fit.png
+    :width: 800
+
+
 J0051+0423
 ----------
 .. image:: best_fits/J0051+0423_fit.png
