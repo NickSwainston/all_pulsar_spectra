@@ -90,9 +90,9 @@ Pulsar Spectra all pulsars fit results
 ======================================
 
 The following is the result of fitting all pulsars with more than four flux density measurements in version
-{pulsar_spectra.__version__} of pulsar_spectra. If using any of the data, please cite `Swainston et al. (2022) <https://ui.adsabs.harvard.edu/abs/2022PASA...39...56S/abstract>`_
+of pulsar_spectra. If using any of the data, please cite `Swainston et al. (2022) <https://ui.adsabs.harvard.edu/abs/2022PASA...39...56S/abstract>`_
 and `Nicholas Swainston's thesis <https://catalogue.curtin.edu.au/discovery/search?vid=61CUR_INST:CUR_ALMA>`_ (link will be updated once it is published).
-Chapter 6 of the thesis analyised version 2.0.0.
+Chapter 6 of the thesis analyised version 2.0.2.
 
 .. toctree::
     :maxdepth: 1
@@ -101,6 +101,7 @@ Chapter 6 of the thesis analyised version 2.0.0.
     spectral_index_summary
     vpeak_summary
     vc_summary
+    suggested_campaigns
 
 
 .. toctree::
@@ -367,6 +368,151 @@ All millisecond pulsar detections (these will be in other galleries).
 ''')
 
 
+# Based on estimated flux density and available measurement frequency, recomend pulsars that should be measured in a flux density campaign
+low_freq_camp = pd.DataFrame(
+    columns=[
+        "Pulsar",
+        "Model",
+        "Min freq (MHz)",
+        "S150 (mJy)",
+        "S300 (mJy)",
+    ]
+)
+high_freq_camp = pd.DataFrame(
+    columns=[
+        "Pulsar",
+        "Model",
+        "Max freq (MHz)",
+        "S5000 (mJy)",
+        "S10000 (mJy)",
+    ]
+)
+min_flux_low = 1 #mJy
+max_freq_low = 300 # MHz
+min_flux_high = 0.01 #mJy
+min_freq_high = 5000 # MHz
+for index, row in df.iterrows():
+    pulsar = row["Pulsar"]
+    # model
+    if row["Model"] == "simple_power_law":
+        model = "SPL"
+    elif row["Model"] == "broken_power_law":
+        model = "BPL"
+    elif row["Model"] == "log_parabolic_spectrum":
+        model = "LPS"
+    elif row["Model"] == "high_frequency_cut_off_power_law":
+        model = "HFCO"
+    elif row["Model"] == "low_frequency_turn_over_power_law":
+        model = "LFTO"
+    elif row["Model"] == "double_turn_over_spectrum":
+        model = "DTOS"
+    # freqs
+    min_freq = float(row["Min freq (MHz)"])
+    max_freq = float(row["Max freq (MHz)"])
+    # fluxs
+    s150   = float(row["S150 (mJy)"])
+    s300   = float(row["S300 (mJy)"])
+    s5000  = float(row["S5000 (mJy)"])
+    s10000 = float(row["S10000 (mJy)"])
+    u_s150   = float(row["u_S150 (mJy)"])
+    u_s300   = float(row["u_S300 (mJy)"])
+    u_s5000  = float(row["u_S5000 (mJy)"])
+    u_s10000 = float(row["u_S10000 (mJy)"])
+
+    # Check if worth following up at low freq
+    # print(pulsar, min_freq, s150, s300)
+    # print(min_freq > 300, s150 > min_flux_low, s300 > min_flux_low)
+    if min_freq > max_freq_low and ( s150 > min_flux_low and s300 > min_flux_low ):
+        low_freq_camp = pd.concat(
+            [
+                low_freq_camp,
+                pd.Series({
+                    "Pulsar": pulsar,
+                    "Model": model,
+                    "Min freq (MHz)": min_freq,
+                    "S150 (mJy)": s150,
+                    "S300 (mJy)": s300,
+                    "u_S150 (mJy)": u_s150,
+                    "u_S300 (mJy)": u_s300,
+                }).to_frame().T,
+            ],
+            ignore_index=True,
+        )
+    # Check if worth following up at high freq
+    # print(pulsar, max_freq, s5000, s10000)
+    # print(max_freq < 5000, s5000 > min_flux_high, s10000 > min_flux_high)
+    if max_freq < min_freq_high and ( s5000 > min_flux_high and s10000 > min_flux_high ):
+        high_freq_camp = pd.concat(
+            [
+                high_freq_camp,
+                pd.Series({
+                    "Pulsar": pulsar,
+                    "Model": model,
+                    "Max freq (MHz)": max_freq,
+                    "S5000 (mJy)": s5000,
+                    "S10000 (mJy)": s10000,
+                    "u_S5000 (mJy)":  u_s5000,
+                    "u_S10000 (mJy)": u_s10000,
+                }).to_frame().T,
+            ],
+            ignore_index=True,
+        )
+
+# print(low_freq_camp)
+# print(high_freq_camp)
+low_freq_camp.to_csv('low_freq_camp.csv', index=False)
+high_freq_camp.to_csv('high_freq_camp.csv', index=False)
+
+# Write them to the webpage
+with open(f'{os.path.dirname(os.path.realpath(__file__))}/docs/suggested_campaigns.rst', 'w') as file:
+    file.write(f'''
+Suggested Campaigns
+===================
+
+Based on estimated flux densities and lack of available measurement frequency, the following pulsars are recommended inclusions in a flux density measurement campaign.
+
+Low Frequency Campaign
+----------------------
+
+The following {len(low_freq_camp)} pulsars had no flux density measurements below {min_freq_high} MHz and
+an estimated flux density of greater than {min_flux_low} mJy at both 150 or 300 MHz.
+The CSV file can be found `here <https://github.com/NickSwainston/all_pulsar_spectra/blob/2.0.2/low_freq_camp.csv>`_.
+
+.. csv-table::
+    :header: "Pulsar", "Model", "Min freq (MHz)", "S150 (mJy)", "S300 (mJy)"
+
+''')
+    print("Pulsar & Model & Min freq (MHz) & S150 (mJy) & S300 (mJy) \\\\")
+    print("\hline \hline")
+    for index, row in low_freq_camp.iterrows():
+        data_str = f'    ":ref:`{row["Pulsar"]}`", "{row["Model"]}", "{row["Min freq (MHz)"]}", '
+        for val, error in [("S150 (mJy)", "u_S150 (mJy)"), ("S300 (mJy)", "u_S300 (mJy)")]:
+            data_str += f'"{row[val]:.1f}±{row[error]:.1f}", '
+        file.write(f'{data_str[:-2]}\n')
+        print(f'{row["Pulsar"]} & {row["Model"]} & {int(row["Min freq (MHz)"])} & {row["S150 (mJy)"]:.1f} $\\pm$ {row["u_S150 (mJy)"]:.1f} & {row["S300 (mJy)"]:.1f} $\\pm$ {row["S300 (mJy)"]:.1f} \\\\')
+
+    file.write(f'''
+
+High Frequency Campaign
+-----------------------
+
+The following {len(high_freq_camp)} pulsars had no flux density measurements above {max_freq_low} MHz and
+an estimated flux density of greater than {min_flux_high} mJy both either 5 or 10 GHz.
+The CSV file can be found `here <https://github.com/NickSwainston/all_pulsar_spectra/blob/2.0.2/high_freq_camp.csv>`_.
+
+.. csv-table::
+    :header: "Pulsar", "Model", "Max freq (MHz)", "S5000 (mJy)", "S10000 (mJy)"
+
+''')
+    print("Pulsar & Model & Max freq (MHz) & S5000 (mJy) & S10000 (mJy) \\\\")
+    print("\hline \hline")
+    for index, row in high_freq_camp.iterrows():
+        data_str = f'    ":ref:`{row["Pulsar"]}`", "{row["Model"]}", "{row["Max freq (MHz)"]}", '
+        for val, error in [("S5000 (mJy)", "u_S5000 (mJy)"), ("S10000 (mJy)", "u_S10000 (mJy)")]:
+            data_str += f'"{row[val]:.2f}±{row[error]:.2f}", '
+        file.write(f'{data_str[:-2]}\n')
+        print(f'{row["Pulsar"]} & {row["Model"]} & {int(row["Max freq (MHz)"])} & {row["S5000 (mJy)"]:.2f} $\\pm$ {row["u_S5000 (mJy)"]:.2f} & {row["S10000 (mJy)"]:.2f} $\\pm$ {row["S10000 (mJy)"]:.2f} \\\\')
+
 
 # Make some summary histograms
 # -----------------------------------------------------------------------------
@@ -412,12 +558,12 @@ def make_histogram_plots(all_data, hist_range, label, titles, plotname, xlabel):
 
 
 # Alpha histogram
-all_indexs = np.array([
+all_indexs = [
     spl_df ["a"],
     hfto_df["a"],
     lfto_df["a"],
     dtos_df["a"],
-])
+]
 hist_range = (min(df["a"]), max(df["a"]))
 titles = [
     'All models',
@@ -431,10 +577,10 @@ make_histogram_plots(all_indexs, hist_range, label=["SPL", "HFCO", "LFTO", "DTOS
 
 # Vc histogram
 hist_range = (np.log10(df["vc"].min()), np.log10(df["vc"].max()))
-all_indexs = np.array([
+all_indexs = [
     np.log10(hfto_df["vc"]),
     np.log10(dtos_df["vc"]),
-])
+]
 titles = [
     'All models',
     'High-frequency cut-off',
@@ -458,10 +604,10 @@ make_histogram_plots(all_indexs, hist_range, label=["HFCO", "DTOS"], titles=titl
 # Vpeak histogram
 hist_range = (np.log10(df["vpeak"].min()), np.log10(df["vpeak"].max()))
 
-all_indexs = np.array([
+all_indexs = [
     np.log10(lfto_df["vpeak"]),
     np.log10(dtos_df["vpeak"]),
-])
+]
 titles = [
     'All models',
     'Low-frequency turn-over',
