@@ -115,9 +115,9 @@ Pulsar Spectra all pulsars fit results
 ======================================
 
 The following is the result of fitting all pulsars with more than four flux density measurements in version
-{pulsar_spectra.__version__} of pulsar_spectra. If using any of the data, please cite `Swainston et al. (2022) <https://ui.adsabs.harvard.edu/abs/2022PASA...39...56S/abstract>`_
+ of pulsar_spectra. If using any of the data, please cite `Swainston et al. (2022) <https://ui.adsabs.harvard.edu/abs/2022PASA...39...56S/abstract>`_
 and `Nicholas Swainston's thesis <https://catalogue.curtin.edu.au/discovery/search?vid=61CUR_INST:CUR_ALMA>`_ (link will be updated once it is published).
-Chapter 6 of the thesis analyised version 2.0.0.
+Chapter 6 of the thesis analyised version 2.0.2.
 
 .. toctree::
     :maxdepth: 1
@@ -437,12 +437,12 @@ def make_histogram_plots(all_data, hist_range, label, titles, plotname, xlabel):
 
 
 # Alpha histogram
-all_indexs = np.array([
+all_indexs = [
     spl_df ["a"],
     hfto_df["a"],
     lfto_df["a"],
     dtos_df["a"],
-])
+]
 hist_range = (min(df["a"]), max(df["a"]))
 titles = [
     'All models',
@@ -456,16 +456,16 @@ make_histogram_plots(all_indexs, hist_range, label=["SPL", "HFCO", "LFTO", "DTOS
 
 # Vc histogram
 hist_range = (np.log10(df["vc"].min()), np.log10(df["vc"].max()))
-all_indexs = np.array([
+all_indexs = [
     np.log10(hfto_df["vc"]),
     np.log10(dtos_df["vc"]),
-])
+]
 titles = [
     'All models',
     'High-frequency cut-off',
     'Double turn-over spectrum',
 ]
-make_histogram_plots(all_indexs, hist_range, label=["HFCO", "DTOS"], titles=titles, plotname="docs/histograms/vc_histogram.png", xlabel="\\nu_c")
+make_histogram_plots(all_indexs, hist_range, label=["HFCO", "DTOS"], titles=titles, plotname="docs/histograms/vc_histogram.png", xlabel="\\nu_{\\mathrm{c}}")
 # Redo with just high frequency trun over
 # fig, ax = plt.subplots()
 # ax.hist(np.log10(hfto_df["vc"]), 20, histtype='bar', color='blue')
@@ -483,16 +483,16 @@ make_histogram_plots(all_indexs, hist_range, label=["HFCO", "DTOS"], titles=titl
 # Vpeak histogram
 hist_range = (np.log10(df["vpeak"].min()), np.log10(df["vpeak"].max()))
 
-all_indexs = np.array([
+all_indexs = [
     np.log10(lfto_df["vpeak"]),
     np.log10(dtos_df["vpeak"]),
-])
+]
 titles = [
     'All models',
     'Low-frequency turn-over',
     'Double turn-over spectrum',
 ]
-make_histogram_plots(all_indexs, hist_range, label=["LFTO", "DTOS"], titles=titles, plotname="docs/histograms/vpeak_histogram.png", xlabel="\\nu_{peak}")
+make_histogram_plots(all_indexs, hist_range, label=["LFTO", "DTOS"], titles=titles, plotname="docs/histograms/vpeak_histogram.png", xlabel="\\nu_{\\mathrm{peak}}")
 
 
 log_df = df#[df["beta"] < 2.05]
@@ -851,7 +851,7 @@ ax.scatter(
     alpha=alpha,
 )
 ax.set_xlabel("$\\nu_O$ (Hz)")
-ax.set_ylabel("$\\nu_{peak}$ (Hz)")
+ax.set_ylabel("$\\nu_{\\mathrm{peak}}$ (Hz)")
 ax.set_yscale('log')
 ax.set_xscale('log')
 ax.tick_params(which='both', direction='in', top=1, right=1)
@@ -889,7 +889,7 @@ ax.scatter(
     label="SPL"
 )
 ax.set_xlabel("DM (pc cm$^{-3}$)")
-ax.set_ylabel("$\\nu_{min}$ (Hz)")
+ax.set_ylabel("$\\nu_{\\mathrm{min}}$ (Hz)")
 ax.set_yscale('log')
 ax.set_xscale('log')
 ax.tick_params(which='both', direction='in', top=1, right=1)
@@ -916,19 +916,18 @@ ax.scatter(
     label="LFTO"
 )
 ax.set_xlabel("DM (pc cm$^{-3}$)")
-ax.set_ylabel("$\\nu_{min}$ (Hz)")
-ax.set_zlabel("$\\nu_{peak}$ (Hz)")
+ax.set_ylabel("$\\nu_{\\mathrm{min}}$ (Hz)")
+ax.set_zlabel("$\\nu_{\\mathrm{peak}}$ (Hz)")
 ax.set_xscale('log')
 ax.set_yscale('log')
 ax.set_zscale('log')
 ax.tick_params(which='both', direction='in', top=1, right=1)
 ax.legend()
 f.tight_layout()
-#f.savefig(f'vmin_DM_check.png'.replace(" ", "_"), dpi=300)
-f.show()
+f.savefig(f'vmin_DM_check.png'.replace(" ", "_"), dpi=300)
+# f.show()
 plt.close(f)
 
-exit()
 
 
 # Make individual correlation plots
@@ -975,8 +974,8 @@ math_names_x = {
 }
 math_names_y = {
         "a": "$\\alpha$",
-        "vpeak log": "$\\nu_{peak}$ (GHz)",
-        "vc log": "$\\nu_c$ (GHz)",
+        "vpeak log": "$\\nu_{\\mathrm{peak}}$ (GHz)",
+        "vc log": "$\\nu_{\\mathrm{c}}$ (GHz)",
 }
 
 correlation_tables = {
@@ -1187,7 +1186,7 @@ Spectral Index Histogram
 # vpeak
 with open(f'{os.path.dirname(os.path.realpath(__file__))}/docs/vpeak_summary.rst', 'w') as file:
     file.write(f'''
-:math:`\\nu_{{peak}}` Summary
+:math:`\\nu_{{\\mathrm{{peak}}}}` Summary
 ==========================
 
 ''')
@@ -1196,7 +1195,7 @@ with open(f'{os.path.dirname(os.path.realpath(__file__))}/docs/vpeak_summary.rst
 
     file.write(f'''
 
-:math:`\\nu_{{peak}}` Histogram
+:math:`\\nu_{{\\mathrm{{peak}}}}` Histogram
 ----------------------------
 
 .. image:: histograms/vpeak_histogram.png
@@ -1222,7 +1221,7 @@ with open(f'{os.path.dirname(os.path.realpath(__file__))}/docs/vpeak_summary.rst
 # v_c
 with open(f'{os.path.dirname(os.path.realpath(__file__))}/docs/vc_summary.rst', 'w') as file:
     file.write(f'''
-:math:`\\nu_{{c}}` Summary
+:math:`\\nu_{{\\mathrm{{c}}}}` Summary
 =======================
 
 ''')
@@ -1232,7 +1231,7 @@ with open(f'{os.path.dirname(os.path.realpath(__file__))}/docs/vc_summary.rst', 
     file.write(f'''
 
 
-:math:`\\nu_{{c}}` Histogram
+:math:`\\nu_{{\\mathrm{{c}}}}` Histogram
 -------------------------
 
 .. image:: histograms/vc_histogram.png
