@@ -41,6 +41,14 @@ output_df = pd.DataFrame(
         "Bandwidth fit?",
         "L400 (mJy kpc^2)",
         "L1400 (mJy kpc^2)",
+        "S150 (mJy)",
+        "u_S150 (mJy)",
+        "S300 (mJy)",
+        "u_S300 (mJy)",
+        "S5000 (mJy)",
+        "u_S5000 (mJy)",
+        "S10000 (mJy)",
+        "u_S10000 (mJy)",
         "Age (Yr)",
         "a"         ,
         "u_a"       ,
@@ -98,6 +106,14 @@ def fit_and_plot(pulsar):
     lps_u_c = None
     l400 = None
     l1400 = None
+    s150 = None
+    u_s150 = None
+    s300 = None
+    u_s300 = None
+    s5000 = None
+    u_s5000 = None
+    s10000 = None
+    u_s10000 = None
     char_age = None
 
 
@@ -126,6 +142,12 @@ def fit_and_plot(pulsar):
             s1400, s1400_err = estimate_flux_density(1400, models,  iminuit_results)
             l400  = s400  * dist**2
             l1400 = s1400 * dist**2
+
+        # Estimate flux desnity at 4 frequencies
+        s150  , u_s150   = estimate_flux_density(150,    models,  iminuit_results)
+        s300  , u_s300   = estimate_flux_density(300,    models,  iminuit_results)
+        s5000 , u_s5000  = estimate_flux_density(5000,   models,  iminuit_results)
+        s10000, u_s10000 = estimate_flux_density(10000,  models,  iminuit_results)
 
 
         # record model specific bits
@@ -222,6 +244,14 @@ def fit_and_plot(pulsar):
         "Bandwidth fit?": band_bool,
         "L400 (mJy kpc^2)": l400,
         "L1400 (mJy kpc^2)": l1400,
+        "S150 (mJy)": s150,
+        "u_S150 (mJy)": u_s150,
+        "S300 (mJy)": s300,
+        "u_S300 (mJy)": u_s300,
+        "S5000 (mJy)": s5000,
+        "u_S5000 (mJy)": u_s5000,
+        "S10000 (mJy)": s10000,
+        "u_S10000 (mJy)": u_s10000,
         "Age (Yr)" : query["AGE"][query_id],
         "a"       : a,
         "u_a"     : u_a,
