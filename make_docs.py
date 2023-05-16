@@ -4,12 +4,23 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import FuncFormatter
 import numpy as np
 from scipy import stats
-import glob
+from psrqpy import QueryATNF
 
 import pulsar_spectra
+from pulsar_spectra.catalogue import collect_catalogue_fluxes
+cat_list = collect_catalogue_fluxes()
 
 # Read and organise data
 # -----------------------------------------------------------------------------
+
+capsize = 1.5
+errorbar_linewidth = 0.7
+marker_border_thickness = 0.5
+markersize = 3.5
+# Add normal pulsar data
+colour = "b"
+ecolour = 'gray'
+alpha = 0.6
 
 # Read in the fits
 df = pd.read_csv('all_pulsar_fits.csv')
@@ -22,6 +33,20 @@ lfto_df  = df[df["Model"] == "low_frequency_turn_over_power_law"]
 dtos_df  = df[df["Model"] == "double_turn_over_spectrum"]
 nomod_df = df[df["Model"] == ""]
 smart_df = df[df["SMART"]]
+
+# query = QueryATNF(params=['P0', 'P1', 'ASSOC', 'BINARY', 'TYPE', 'P1_I'])
+# fig = query.ppdot()
+# fig.savefig("ppdot_all.png")
+# query = QueryATNF(psrs=list(df["Pulsar"]), params=['P0', 'P1', 'ASSOC', 'BINARY', 'TYPE', 'P1_I'])
+# fig = query.ppdot()
+# fig.savefig("ppdot_ours.png")
+# query = QueryATNF(psrs=list(hfto_df["Pulsar"]), params=['P0', 'P1', 'ASSOC', 'BINARY', 'TYPE', 'P1_I'])
+# fig = query.ppdot()
+# fig.savefig("ppdot_hfco.png")
+# query = QueryATNF(psrs=list(lfto_df["Pulsar"]), params=['P0', 'P1', 'ASSOC', 'BINARY', 'TYPE', 'P1_I'])
+# fig = query.ppdot()
+# fig.savefig("ppdot_lfto.png")
+# exit()
 
 msp_cutoff = 0.03 # seconds
 
@@ -586,7 +611,7 @@ titles = [
     'High-frequency cut-off',
     'Double turn-over spectrum',
 ]
-make_histogram_plots(all_indexs, hist_range, label=["HFCO", "DTOS"], titles=titles, plotname="docs/histograms/vc_histogram.png", xlabel="\\nu_c")
+make_histogram_plots(all_indexs, hist_range, label=["HFCO", "DTOS"], titles=titles, plotname="docs/histograms/vc_histogram.png", xlabel="\\nu_{\\mathrm{c}}")
 # Redo with just high frequency trun over
 # fig, ax = plt.subplots()
 # ax.hist(np.log10(hfto_df["vc"]), 20, histtype='bar', color='blue')
@@ -613,7 +638,7 @@ titles = [
     'Low-frequency turn-over',
     'Double turn-over spectrum',
 ]
-make_histogram_plots(all_indexs, hist_range, label=["LFTO", "DTOS"], titles=titles, plotname="docs/histograms/vpeak_histogram.png", xlabel="\\nu_{peak}")
+make_histogram_plots(all_indexs, hist_range, label=["LFTO", "DTOS"], titles=titles, plotname="docs/histograms/vpeak_histogram.png", xlabel="\\nu_{\\mathrm{peak}}")
 
 
 log_df = df#[df["beta"] < 2.05]
@@ -902,6 +927,155 @@ def plot_correlations(
         plt.close(f)
     return weights_str
 
+# A quick period vs fdot plot
+
+np_df = log_df[log_df["ATNF Period (s)"] >= msp_cutoff]
+f, ax = plt.subplots()
+print(np_df["ATNF Period (s) log"])
+print(np_df["ATNF Fdot log"])
+ax.scatter(
+    list(np_df["ATNF Period (s)"]),
+    list(np_df["ATNF Fdot"]),
+    s=markersize,
+    c=colour,
+    alpha=alpha,
+)
+ax.set_xlabel("P (s)")
+ax.set_ylabel("$\left| \dot{\\tilde{\\nu}} \\right|$ (s$^{-2}$)")
+ax.set_yscale('log')
+ax.set_xscale('log')
+ax.yaxis.set_major_formatter(
+    FuncFormatter(lambda x, p:
+        '$\mathdefault{10^{%i}}$' % x
+        if x > 1e5 else
+        '%g' % x
+    )
+)
+ax.tick_params(which='both', direction='in', top=1, right=1)
+f.tight_layout()
+f.savefig(f'nudot_p_check.png'.replace(" ", "_"), dpi=300)
+plt.close(f)
+
+
+#  Some dm covariance plot checks
+lfto_np_df = lfto_df[lfto_df["ATNF Period (s)"] >= msp_cutoff]
+f, ax = plt.subplots()
+geo_freq = []
+for pulsar in lfto_np_df["Pulsar"]:
+    freqs, bands, fluxs, flux_errs, refs = cat_list[pulsar]
+    v0_Hz = 10**((np.log10(min(freqs))+np.log10(max(freqs)))/2) * 1e6
+    geo_freq.append(v0_Hz)
+ax.scatter(
+    geo_freq,
+    list(lfto_np_df["ATNF DM"]),
+    s=markersize,
+    c=colour,
+    alpha=alpha,
+)
+ax.set_xlabel("$\\nu_O$ (Hz)")
+ax.set_ylabel("DM (pc cm$^{-3}$)")
+ax.set_yscale('log')
+ax.set_xscale('log')
+ax.yaxis.set_major_formatter(
+    FuncFormatter(lambda x, p:
+        '$\mathdefault{10^{%i}}$' % x
+        if x > 1e5 else
+        '%g' % x
+    )
+)
+ax.tick_params(which='both', direction='in', top=1, right=1)
+f.tight_layout()
+f.savefig(f'v0_DM_check.png'.replace(" ", "_"), dpi=300)
+plt.close(f)
+
+f, ax = plt.subplots()
+ax.scatter(
+    geo_freq,
+    list(lfto_np_df["vpeak"]),
+    s=markersize,
+    c=colour,
+    alpha=alpha,
+)
+ax.set_xlabel("$\\nu_O$ (Hz)")
+ax.set_ylabel("$\\nu_{\\mathrm{peak}}$ (Hz)")
+ax.set_yscale('log')
+ax.set_xscale('log')
+ax.tick_params(which='both', direction='in', top=1, right=1)
+f.tight_layout()
+f.savefig(f'v0_vpeak_check.png'.replace(" ", "_"), dpi=300)
+plt.close(f)
+
+f, ax = plt.subplots()
+markersize = 10
+freq_min = []
+for pulsar in lfto_np_df["Pulsar"]:
+    freqs, bands, fluxs, flux_errs, refs = cat_list[pulsar]
+    v0_Hz = min(freqs) * 1e6
+    freq_min.append(v0_Hz)
+ax.scatter(
+    list(lfto_np_df["ATNF DM"]),
+    freq_min,
+    s=markersize,
+    c=colour,
+    alpha=alpha,
+    label="LFTO"
+)
+spl_np_df = spl_df[spl_df["ATNF Period (s)"] >= msp_cutoff]
+freq_min = []
+for pulsar in spl_np_df["Pulsar"]:
+    freqs, bands, fluxs, flux_errs, refs = cat_list[pulsar]
+    v0_Hz = min(freqs) * 1e6
+    freq_min.append(v0_Hz)
+ax.scatter(
+    list(spl_np_df["ATNF DM"]),
+    freq_min,
+    s=markersize,
+    c='g',
+    alpha=alpha,
+    label="SPL"
+)
+ax.set_xlabel("DM (pc cm$^{-3}$)")
+ax.set_ylabel("$\\nu_{\\mathrm{min}}$ (Hz)")
+ax.set_yscale('log')
+ax.set_xscale('log')
+ax.tick_params(which='both', direction='in', top=1, right=1)
+ax.legend()
+f.tight_layout()
+f.savefig(f'vmin_DM_check.png'.replace(" ", "_"), dpi=300)
+plt.close(f)
+
+
+fig = plt.figure()
+ax = fig.add_subplot(projection='3d')
+freq_min = []
+for pulsar in lfto_np_df["Pulsar"]:
+    freqs, bands, fluxs, flux_errs, refs = cat_list[pulsar]
+    v0_Hz = min(freqs) * 1e6
+    freq_min.append(v0_Hz)
+ax.scatter(
+    list(lfto_np_df["ATNF DM"]),
+    freq_min,
+    list(lfto_np_df["vpeak"]),
+    s=markersize,
+    c=colour,
+    alpha=alpha,
+    label="LFTO"
+)
+ax.set_xlabel("DM (pc cm$^{-3}$)")
+ax.set_ylabel("$\\nu_{\\mathrm{min}}$ (Hz)")
+ax.set_zlabel("$\\nu_{\\mathrm{peak}}$ (Hz)")
+ax.set_xscale('log')
+ax.set_yscale('log')
+ax.set_zscale('log')
+ax.tick_params(which='both', direction='in', top=1, right=1)
+ax.legend()
+f.tight_layout()
+f.savefig(f'vmin_DM_check.png'.replace(" ", "_"), dpi=300)
+# f.show()
+plt.close(f)
+
+
+
 # Make individual correlation plots
 # df, x, y
 corr_plots = [
@@ -946,8 +1120,8 @@ math_names_x = {
 }
 math_names_y = {
         "a": "$\\alpha$",
-        "vpeak log": "$\\nu_{peak}$ (GHz)",
-        "vc log": "$\\nu_c$ (GHz)",
+        "vpeak log": "$\\nu_{\\mathrm{peak}}$ (GHz)",
+        "vc log": "$\\nu_{\\mathrm{c}}$ (GHz)",
 }
 
 correlation_tables = {
@@ -1158,7 +1332,7 @@ Spectral Index Histogram
 # vpeak
 with open(f'{os.path.dirname(os.path.realpath(__file__))}/docs/vpeak_summary.rst', 'w') as file:
     file.write(f'''
-:math:`\\nu_{{peak}}` Summary
+:math:`\\nu_{{\\mathrm{{peak}}}}` Summary
 ==========================
 
 ''')
@@ -1167,7 +1341,7 @@ with open(f'{os.path.dirname(os.path.realpath(__file__))}/docs/vpeak_summary.rst
 
     file.write(f'''
 
-:math:`\\nu_{{peak}}` Histogram
+:math:`\\nu_{{\\mathrm{{peak}}}}` Histogram
 ----------------------------
 
 .. image:: histograms/vpeak_histogram.png
@@ -1193,7 +1367,7 @@ with open(f'{os.path.dirname(os.path.realpath(__file__))}/docs/vpeak_summary.rst
 # v_c
 with open(f'{os.path.dirname(os.path.realpath(__file__))}/docs/vc_summary.rst', 'w') as file:
     file.write(f'''
-:math:`\\nu_{{c}}` Summary
+:math:`\\nu_{{\\mathrm{{c}}}}` Summary
 =======================
 
 ''')
@@ -1203,7 +1377,7 @@ with open(f'{os.path.dirname(os.path.realpath(__file__))}/docs/vc_summary.rst', 
     file.write(f'''
 
 
-:math:`\\nu_{{c}}` Histogram
+:math:`\\nu_{{\\mathrm{{c}}}}` Histogram
 -------------------------
 
 .. image:: histograms/vc_histogram.png
