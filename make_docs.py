@@ -612,23 +612,9 @@ titles = [
     'Double turn-over spectrum',
 ]
 make_histogram_plots(all_indexs, hist_range, label=["HFCO", "DTOS"], titles=titles, plotname="docs/histograms/vc_histogram.png", xlabel="\\nu_{\\mathrm{c}}")
-# Redo with just high frequency trun over
-# fig, ax = plt.subplots()
-# ax.hist(np.log10(hfto_df["vc"]), 20, histtype='bar', color='blue')
-# ax.xaxis.set_major_formatter(
-#     FuncFormatter(lambda x, _:
-#         f'{10**x/1e9:.1f}'
-#     )
-# )
-# ax.set_xlabel(f"High-frequency cut off frequency (GHz)")
-# ax.set_ylabel(f"#")
-# fig.tight_layout()
-# fig.savefig("docs/histograms/vc_histogram_just_hfto.png")
-# plt.close(fig)
 
 # Vpeak histogram
 hist_range = (np.log10(df["vpeak"].min()), np.log10(df["vpeak"].max()))
-
 all_indexs = [
     np.log10(lfto_df["vpeak"]),
     np.log10(dtos_df["vpeak"]),
@@ -639,6 +625,19 @@ titles = [
     'Double turn-over spectrum',
 ]
 make_histogram_plots(all_indexs, hist_range, label=["LFTO", "DTOS"], titles=titles, plotname="docs/histograms/vpeak_histogram.png", xlabel="\\nu_{\\mathrm{peak}}")
+
+# MSP vs slow pulsar histograms
+hist_range = (np_spl_df["a"].min(), np_spl_df["a"].max())
+all_indexs = [
+    msp_spl_df["a"],
+    np_spl_df["a"],
+]
+titles = [
+    'MSPs and slow pulsars',
+    'MSPs',
+    'Slow pulsars',
+]
+make_histogram_plots(all_indexs, hist_range, label=["MSP", "Slow pulsar"], titles=titles, plotname="docs/histograms/msp_spectral_index_histogram.png", xlabel="\\alpha")
 
 
 log_df = df#[df["beta"] < 2.05]
@@ -1217,6 +1216,7 @@ for ya, ycol in enumerate(ycols):
             (msp_df,      maxes, 'Only MSPs'),
             (slow_df,     saxes, 'Only Slow Pulsars'),
         ]
+        plt.rcParams.update({'font.size': 18})
         for sub_df, sub_axes, label in df_axes_pairs:
             weight_str = weighted_line_corr = plot_correlations(
                 sub_df,
