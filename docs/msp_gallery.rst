@@ -42,6 +42,18 @@ J0034-0534
     :width: 800
 
 
+J0101-6422
+----------
+.. image:: best_fits/J0101-6422_fit.png
+    :width: 800
+
+
+J0125-2327
+----------
+.. image:: best_fits/J0125-2327_fit.png
+    :width: 800
+
+
 J0214+5222
 ----------
 .. image:: best_fits/J0214+5222_fit.png
@@ -78,9 +90,21 @@ J0514-4002A
     :width: 800
 
 
+J0610-2100
+----------
+.. image:: best_fits/J0610-2100_fit.png
+    :width: 800
+
+
 J0613-0200
 ----------
 .. image:: best_fits/J0613-0200_fit.png
+    :width: 800
+
+
+J0614-3329
+----------
+.. image:: best_fits/J0614-3329_fit.png
     :width: 800
 
 
@@ -93,6 +117,12 @@ J0621+1002
 J0636+5128
 ----------
 .. image:: best_fits/J0636+5128_fit.png
+    :width: 800
+
+
+J0636-3044
+----------
+.. image:: best_fits/J0636-3044_fit.png
     :width: 800
 
 
@@ -126,6 +156,12 @@ J0740+6620
     :width: 800
 
 
+J0742+4110
+----------
+.. image:: best_fits/J0742+4110_fit.png
+    :width: 800
+
+
 J0751+1807
 ----------
 .. image:: best_fits/J0751+1807_fit.png
@@ -144,9 +180,21 @@ J0931-1902
     :width: 800
 
 
+J0955-6150
+----------
+.. image:: best_fits/J0955-6150_fit.png
+    :width: 800
+
+
 J1012+5307
 ----------
 .. image:: best_fits/J1012+5307_fit.png
+    :width: 800
+
+
+J1012-4235
+----------
+.. image:: best_fits/J1012-4235_fit.png
     :width: 800
 
 
@@ -168,15 +216,51 @@ J1024-0719
     :width: 800
 
 
+J1036-8317
+----------
+.. image:: best_fits/J1036-8317_fit.png
+    :width: 800
+
+
 J1045-4509
 ----------
 .. image:: best_fits/J1045-4509_fit.png
     :width: 800
 
 
+J1101-6424
+----------
+.. image:: best_fits/J1101-6424_fit.png
+    :width: 800
+
+
+J1103-5403
+----------
+.. image:: best_fits/J1103-5403_fit.png
+    :width: 800
+
+
 J1125+7819
 ----------
 .. image:: best_fits/J1125+7819_fit.png
+    :width: 800
+
+
+J1125-5825
+----------
+.. image:: best_fits/J1125-5825_fit.png
+    :width: 800
+
+
+J1125-6014
+----------
+.. image:: best_fits/J1125-6014_fit.png
+    :width: 800
+
+
+J1216-6410
+----------
+.. image:: best_fits/J1216-6410_fit.png
     :width: 800
 
 
@@ -192,6 +276,12 @@ J1300+1240
     :width: 800
 
 
+J1302-3258
+----------
+.. image:: best_fits/J1302-3258_fit.png
+    :width: 800
+
+
 J1327-0755
 ----------
 .. image:: best_fits/J1327-0755_fit.png
@@ -201,6 +291,24 @@ J1327-0755
 J1400-1431
 ----------
 .. image:: best_fits/J1400-1431_fit.png
+    :width: 800
+
+
+J1421-4409
+----------
+.. image:: best_fits/J1421-4409_fit.png
+    :width: 800
+
+
+J1431-5740
+----------
+.. image:: best_fits/J1431-5740_fit.png
+    :width: 800
+
+
+J1435-6100
+----------
+.. image:: best_fits/J1435-6100_fit.png
     :width: 800
 
 
@@ -219,6 +327,48 @@ J1453+1902
 J1455-3330
 ----------
 .. image:: best_fits/J1455-3330_fit.png
+    :width: 800
+
+
+J1513-2550
+----------
+.. image:: best_fits/J1513-2550_fit.png
+    :width: 800
+
+
+J1514-4946
+----------
+.. image:: best_fits/J1514-4946_fit.png
+    :width: 800
+
+
+J1525-5545
+----------
+.. image:: best_fits/J1525-5545_fit.png
+    :width: 800
+
+
+J1543-5149
+----------
+.. image:: best_fits/J1543-5149_fit.png
+    :width: 800
+
+
+J1545-4550
+----------
+.. image:: best_fits/J1545-4550_fit.png
+    :width: 800
+
+
+J1547-5709
+----------
+.. image:: best_fits/J1547-5709_fit.png
+    :width: 800
+
+
+J1551-0658
+----------
+.. image:: best_fits/J1551-0658_fit.png
     :width: 800
 
 
@@ -246,6 +396,18 @@ J1623-2631
     :width: 800
 
 
+J1628-3205
+----------
+.. image:: best_fits/J1628-3205_fit.png
+    :width: 800
+
+
+J1629-6902
+----------
+.. image:: best_fits/J1629-6902_fit.png
+    :width: 800
+
+
 J1640+2224
 ----------
 .. image:: best_fits/J1640+2224_fit.png
@@ -264,6 +426,54 @@ J1643-1224
     :width: 800
 
 
+J1652-4838
+----------
+.. image:: best_fits/J1652-4838_fit.png
+    :width: 800
+
+
+J1653-2054
+----------
+.. image:: best_fits/J1653-2054_fit.png
+    :width: 800
+
+
+J1658-5324
+----------
+.. image:: best_fits/J1658-5324_fit.png
+    :width: 800
+
+
+J1701-3006A
+-----------
+.. image:: best_fits/J1701-3006A_fit.png
+    :width: 800
+
+
+J1701-3006B
+-----------
+.. image:: best_fits/J1701-3006B_fit.png
+    :width: 800
+
+
+J1701-3006C
+-----------
+.. image:: best_fits/J1701-3006C_fit.png
+    :width: 800
+
+
+J1705-1903
+----------
+.. image:: best_fits/J1705-1903_fit.png
+    :width: 800
+
+
+J1708-3506
+----------
+.. image:: best_fits/J1708-3506_fit.png
+    :width: 800
+
+
 J1709+2313
 ----------
 .. image:: best_fits/J1709+2313_fit.png
@@ -276,15 +486,39 @@ J1713+0747
     :width: 800
 
 
+J1719-1438
+----------
+.. image:: best_fits/J1719-1438_fit.png
+    :width: 800
+
+
+J1721-2457
+----------
+.. image:: best_fits/J1721-2457_fit.png
+    :width: 800
+
+
 J1730-2304
 ----------
 .. image:: best_fits/J1730-2304_fit.png
     :width: 800
 
 
+J1731-1847
+----------
+.. image:: best_fits/J1731-1847_fit.png
+    :width: 800
+
+
 J1732-5049
 ----------
 .. image:: best_fits/J1732-5049_fit.png
+    :width: 800
+
+
+J1737-0811
+----------
+.. image:: best_fits/J1737-0811_fit.png
     :width: 800
 
 
@@ -318,9 +552,27 @@ J1748-2446A
     :width: 800
 
 
+J1751-2857
+----------
+.. image:: best_fits/J1751-2857_fit.png
+    :width: 800
+
+
 J1756-2251
 ----------
 .. image:: best_fits/J1756-2251_fit.png
+    :width: 800
+
+
+J1757-5322
+----------
+.. image:: best_fits/J1757-5322_fit.png
+    :width: 800
+
+
+J1801-1417
+----------
+.. image:: best_fits/J1801-1417_fit.png
     :width: 800
 
 
@@ -348,6 +600,12 @@ J1804-2717
     :width: 800
 
 
+J1804-2858
+----------
+.. image:: best_fits/J1804-2858_fit.png
+    :width: 800
+
+
 J1806+2819
 ----------
 .. image:: best_fits/J1806+2819_fit.png
@@ -357,6 +615,12 @@ J1806+2819
 J1810+1744
 ----------
 .. image:: best_fits/J1810+1744_fit.png
+    :width: 800
+
+
+J1811-2405
+----------
+.. image:: best_fits/J1811-2405_fit.png
     :width: 800
 
 
@@ -378,6 +642,12 @@ J1824-2452A
     :width: 800
 
 
+J1825-0319
+----------
+.. image:: best_fits/J1825-0319_fit.png
+    :width: 800
+
+
 J1832-0836
 ----------
 .. image:: best_fits/J1832-0836_fit.png
@@ -387,6 +657,12 @@ J1832-0836
 J1843-1113
 ----------
 .. image:: best_fits/J1843-1113_fit.png
+    :width: 800
+
+
+J1843-1448
+----------
+.. image:: best_fits/J1843-1448_fit.png
     :width: 800
 
 
@@ -402,9 +678,21 @@ J1857+0943
     :width: 800
 
 
+J1902-5105
+----------
+.. image:: best_fits/J1902-5105_fit.png
+    :width: 800
+
+
 J1903+0327
 ----------
 .. image:: best_fits/J1903+0327_fit.png
+    :width: 800
+
+
+J1903-7051
+----------
+.. image:: best_fits/J1903-7051_fit.png
     :width: 800
 
 
@@ -444,6 +732,12 @@ J1923+2515
     :width: 800
 
 
+J1933-6211
+----------
+.. image:: best_fits/J1933-6211_fit.png
+    :width: 800
+
+
 J1939+2134
 ----------
 .. image:: best_fits/J1939+2134_fit.png
@@ -453,6 +747,18 @@ J1939+2134
 J1944+0907
 ----------
 .. image:: best_fits/J1944+0907_fit.png
+    :width: 800
+
+
+J1946-5403
+----------
+.. image:: best_fits/J1946-5403_fit.png
+    :width: 800
+
+
+J1949+3106
+----------
+.. image:: best_fits/J1949+3106_fit.png
     :width: 800
 
 
@@ -498,6 +804,12 @@ J2033+1734
     :width: 800
 
 
+J2039-3616
+----------
+.. image:: best_fits/J2039-3616_fit.png
+    :width: 800
+
+
 J2043+1711
 ----------
 .. image:: best_fits/J2043+1711_fit.png
@@ -525,6 +837,12 @@ J2129-5721
 J2145-0750
 ----------
 .. image:: best_fits/J2145-0750_fit.png
+    :width: 800
+
+
+J2150-0326
+----------
+.. image:: best_fits/J2150-0326_fit.png
     :width: 800
 
 
@@ -558,6 +876,12 @@ J2234+0944
     :width: 800
 
 
+J2236-5527
+----------
+.. image:: best_fits/J2236-5527_fit.png
+    :width: 800
+
+
 J2241-5236
 ----------
 .. image:: best_fits/J2241-5236_fit.png
@@ -585,4 +909,10 @@ J2317+1439
 J2322+2057
 ----------
 .. image:: best_fits/J2322+2057_fit.png
+    :width: 800
+
+
+J2322-2650
+----------
+.. image:: best_fits/J2322-2650_fit.png
     :width: 800

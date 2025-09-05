@@ -503,7 +503,7 @@ Low Frequency Campaign
 
 The following {len(low_freq_camp)} pulsars had no flux density measurements below {min_freq_high} MHz and
 an estimated flux density of greater than {min_flux_low} mJy at both 150 or 300 MHz.
-The CSV file can be found `here <https://github.com/NickSwainston/all_pulsar_spectra/blob/{pulsar_spectra.__version__}/low_freq_camp.csv>`_.
+The CSV file can be found `here <https://github.com/NickSwainston/all_pulsar_spectra/blob/{pulsar_spectra.__version__}/low_freq_camp.csv>`__.
 
 .. csv-table::
     :header: "Pulsar", "Model", "Min freq (MHz)", "S150 (mJy)", "S300 (mJy)"
@@ -530,7 +530,7 @@ High Frequency Campaign
 
 The following {len(high_freq_camp)} pulsars had no flux density measurements above {max_freq_low} MHz and
 an estimated flux density of greater than {min_flux_high} mJy both either 5 or 10 GHz.
-The CSV file can be found `here <https://github.com/NickSwainston/all_pulsar_spectra/blob/{pulsar_spectra.__version__}/high_freq_camp.csv>`_.
+The CSV file can be found `here <https://github.com/NickSwainston/all_pulsar_spectra/blob/{pulsar_spectra.__version__}/high_freq_camp.csv>`__.
 
 .. csv-table::
     :header: "Pulsar", "Model", "Max freq (MHz)", "S5000 (mJy)", "S10000 (mJy)"
@@ -1243,13 +1243,13 @@ for ya, ycol in enumerate(ycols):
         "+------------------------------------------+--------------------------+--------------------------+--------------------------+--------------------------+--------------------------+"
     )
     correlation_tables[ycol].append(
-        "|                                 #pulsars |                      {len(ycol_df):3d} |                      {nbinary:3d} |                      {nisolated:3d} |                      {nmsp:3d} |                      {nslow:3d} |"
+        f"|                                 #pulsars |                      {len(ycol_df):3d} |                      {nbinary:3d} |                      {nisolated:3d} |                      {nmsp:3d} |                      {nslow:3d} |"
     )
     correlation_tables[ycol].append(
         "+------------------------------------------+--------------------------+--------------------------+--------------------------+--------------------------+--------------------------+"
     )
     correlation_tables[ycol].append(
-        "|                :math:`{{\\bf log_{{10}}(x)}}` | :math:`{{\\bf r_s (p, N)}}` | :math:`{{\\bf r_s (p, N)}}` | :math:`{{\\bf r_s (p, N)}}` | :math:`{{\\bf r_s (p, N)}}` | :math:`{{\\bf r_s (p, N)}}` |"
+        "|                :math:`{\\bf log_{10}(x)}` | :math:`{\\bf r_s (p, N)}` | :math:`{\\bf r_s (p, N)}` | :math:`{\\bf r_s (p, N)}` | :math:`{\\bf r_s (p, N)}` | :math:`{\\bf r_s (p, N)}` |"
     )
     correlation_tables[ycol].append(
         "+==========================================+==========================+==========================+==========================+==========================+==========================+"
@@ -1426,8 +1426,8 @@ with open(
     f"{os.path.dirname(os.path.realpath(__file__))}/docs/vpeak_summary.rst", "w"
 ) as file:
     file.write("""
-:math:`\\nu_{{\\mathrm{{peak}}}}` Summary
-==========================
+:math:`\\nu_{\mathrm{peak}}` Summary
+=========================================
 
 """)
     for line in correlation_tables["vpeak log"]:
@@ -1435,8 +1435,8 @@ with open(
 
     file.write("""
 
-:math:`\\nu_{{\\mathrm{{peak}}}}` Histogram
-----------------------------
+:math:`\\nu_{\mathrm{peak}}` Histogram
+-------------------------------------------
 
 .. image:: histograms/vpeak_histogram.png
     :width: 800
@@ -1461,8 +1461,8 @@ with open(
 # v_c
 with open(f"{docs_dir}/vc_summary.rst", "w") as file:
     file.write("""
-:math:`\\nu_{{\\mathrm{{c}}}}` Summary
-=======================
+:math:`\\nu_{\mathrm{c}}` Summary
+================================
 
 """)
     for line in correlation_tables["vc log"]:
@@ -1471,8 +1471,8 @@ with open(f"{docs_dir}/vc_summary.rst", "w") as file:
     file.write("""
 
 
-:math:`\\nu_{{\\mathrm{{c}}}}` Histogram
--------------------------
+:math:`\\nu_{\mathrm{c}}` Histogram
+----------------------------------
 
 .. image:: histograms/vc_histogram.png
     :width: 800

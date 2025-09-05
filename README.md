@@ -25,6 +25,6 @@ make_docs.py
 ```
 Then use [sphinx](https://www.sphinx-doc.org/en/master/) to create the html with
 ```
-sphinx-build docs Html
+sphinx-build docs html
 ```
 Then you can view the docs by opening the `html/index.html` file in your browser.
