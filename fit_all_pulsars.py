@@ -19,7 +19,7 @@ query = psrqpy.QueryATNF().pandas
 
 results_record = []
 
-#for output csv
+# for output csv
 output_df = pd.DataFrame(
     columns=[
         "Pulsar",
@@ -50,28 +50,28 @@ output_df = pd.DataFrame(
         "S10000 (mJy)",
         "u_S10000 (mJy)",
         "Age (Yr)",
-        "a"         ,
-        "u_a"       ,
-        "c"         ,
-        "u_c"       ,
-        "vb"        ,
-        "u_vb"      ,
-        "a1"        ,
-        "u_a1"      ,
-        "a2"        ,
-        "u_a2"      ,
-        "vc"        ,
-        "u_vc"      ,
-        "vpeak"     ,
-        "u_vpeak"   ,
-        "beta"      ,
-        "u_beta"    ,
-        "lps_a"     ,
-        "lps_u_a"   ,
-        "lps_b"     ,
-        "lps_u_b"   ,
-        "lps_c"     ,
-        "lps_u_c"   ,
+        "a",
+        "u_a",
+        "c",
+        "u_c",
+        "vb",
+        "u_vb",
+        "a1",
+        "u_a1",
+        "a2",
+        "u_a2",
+        "vc",
+        "u_vc",
+        "vpeak",
+        "u_vpeak",
+        "beta",
+        "u_beta",
+        "lps_a",
+        "lps_u_a",
+        "lps_b",
+        "lps_u_b",
+        "lps_c",
+        "lps_u_c",
         "SMART",
     ]
 )
@@ -80,29 +80,31 @@ output_df = pd.DataFrame(
 def fit_and_plot(pulsar):
     # Set up plot
     scale_figure = 0.9
-    fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(5.5*scale_figure,4*scale_figure))
+    fig, ax = plt.subplots(
+        nrows=1, ncols=1, figsize=(5.5 * scale_figure, 4 * scale_figure)
+    )
 
-    a       = None
-    u_a     = None
-    c       = None
-    u_c     = None
-    vb      = None
-    u_vb    = None
-    a1      = None
-    u_a1    = None
-    a2      = None
-    u_a2    = None
-    vc      = None
-    u_vc    = None
-    vpeak   = None
+    a = None
+    u_a = None
+    c = None
+    u_c = None
+    vb = None
+    u_vb = None
+    a1 = None
+    u_a1 = None
+    a2 = None
+    u_a2 = None
+    vc = None
+    u_vc = None
+    vpeak = None
     u_vpeak = None
-    beta    = None
-    u_beta  = None
-    lps_a   = None
+    beta = None
+    u_beta = None
+    lps_a = None
     lps_u_a = None
-    lps_b   = None
+    lps_b = None
     lps_u_b = None
-    lps_c   = None
+    lps_c = None
     lps_u_c = None
     l400 = None
     l1400 = None
@@ -114,41 +116,46 @@ def fit_and_plot(pulsar):
     u_s5000 = None
     s10000 = None
     u_s10000 = None
-    char_age = None
-
 
     freq_all, bands_all, flux_all, flux_err_all, ref_all = cat_dict[pulsar]
-    query_id = list(query['PSRJ']).index(pulsar)
+    query_id = list(query["PSRJ"]).index(pulsar)
 
-    if 'Bhat_2022' in ref_all:
+    if "Bhat_2022" in ref_all:
         smart_pulsar = True
     else:
         smart_pulsar = False
 
     print(pulsar)
     models, iminuit_results, fit_infos, p_best, band_bool = find_best_spectral_fit(
-        pulsar, freq_all, bands_all, flux_all, flux_err_all, ref_all,
-        plot_best=True,# axis=ax
+        pulsar,
+        freq_all,
+        bands_all,
+        flux_all,
+        flux_err_all,
+        ref_all,
+        plot_best=True,  # axis=ax
     )
 
     if models is not None:
         fit_loc = glob.glob(f"{pulsar}_*_fit.png")
-        shutil.move(fit_loc[0], f"{os.path.dirname(os.path.realpath(__file__))}/docs/best_fits/{pulsar}_fit.png")
+        shutil.move(
+            fit_loc[0],
+            f"{os.path.dirname(os.path.realpath(__file__))}/docs/best_fits/{pulsar}_fit.png",
+        )
 
         # Calculate luminosity at 2 frequencies
         dist = query["DIST"][query_id]
         if not np.isnan(dist):
-            s400, s400_err  = estimate_flux_density(400,  models,  iminuit_results)
-            s1400, s1400_err = estimate_flux_density(1400, models,  iminuit_results)
-            l400  = s400  * dist**2
+            s400, s400_err = estimate_flux_density(400, models, iminuit_results)
+            s1400, s1400_err = estimate_flux_density(1400, models, iminuit_results)
+            l400 = s400 * dist**2
             l1400 = s1400 * dist**2
 
         # Estimate flux desnity at 4 frequencies
-        s150  , u_s150   = estimate_flux_density(150,    models,  iminuit_results)
-        s300  , u_s300   = estimate_flux_density(300,    models,  iminuit_results)
-        s5000 , u_s5000  = estimate_flux_density(5000,   models,  iminuit_results)
-        s10000, u_s10000 = estimate_flux_density(10000,  models,  iminuit_results)
-
+        s150, u_s150 = estimate_flux_density(150, models, iminuit_results)
+        s300, u_s300 = estimate_flux_density(300, models, iminuit_results)
+        s5000, u_s5000 = estimate_flux_density(5000, models, iminuit_results)
+        s10000, u_s10000 = estimate_flux_density(10000, models, iminuit_results)
 
         # record model specific bits
         if models == "simple_power_law":
@@ -157,7 +164,7 @@ def fit_and_plot(pulsar):
             c = iminuit_results.values["c"]
             u_c = iminuit_results.errors["c"]
         elif models == "broken_power_law":
-            #vb, a1, a2, b
+            # vb, a1, a2, b
             vb = iminuit_results.values["vb"]
             u_vb = iminuit_results.errors["vb"]
             a1 = iminuit_results.values["a1"]
@@ -226,20 +233,22 @@ def fit_and_plot(pulsar):
 
     # Output data which will re recorded as a CSV later
     return {
-        "Pulsar":pulsar,
-        "ATNF Period (s)":query["P0"][query_id],
-        "ATNF Pdot":query["P1"][query_id],
-        "ATNF Spin Frequency (Hz)":query["F0"][query_id],
-        "ATNF Fdot":query["F1"][query_id],
-        "ATNF DM":query["DM"][query_id],
-        "ATNF B_surf (G)":query["BSURF"][query_id],
-        "ATNF B_LC (G)":query["BSURF"][query_id] * 9.2 * (10**12 * query["P0"][query_id]**3),
-        "ATNF E_dot (ergs/s)":query["EDOT"][query_id],
-        "ANTF Binary (type)":query["BINARY"][query_id],
-        "Model":models,
-        "Probability Best":p_best,
-        "Min freq (MHz)":min_freq,
-        "Max freq (MHz)":max_freq,
+        "Pulsar": pulsar,
+        "ATNF Period (s)": query["P0"][query_id],
+        "ATNF Pdot": query["P1"][query_id],
+        "ATNF Spin Frequency (Hz)": query["F0"][query_id],
+        "ATNF Fdot": query["F1"][query_id],
+        "ATNF DM": query["DM"][query_id],
+        "ATNF B_surf (G)": query["BSURF"][query_id],
+        "ATNF B_LC (G)": query["BSURF"][query_id]
+        * 9.2
+        * (10**12 * query["P0"][query_id] ** 3),
+        "ATNF E_dot (ergs/s)": query["EDOT"][query_id],
+        "ANTF Binary (type)": query["BINARY"][query_id],
+        "Model": models,
+        "Probability Best": p_best,
+        "Min freq (MHz)": min_freq,
+        "Max freq (MHz)": max_freq,
         "N data flux": len(flux_all),
         "Bandwidth fit?": band_bool,
         "L400 (mJy kpc^2)": l400,
@@ -252,30 +261,30 @@ def fit_and_plot(pulsar):
         "u_S5000 (mJy)": u_s5000,
         "S10000 (mJy)": s10000,
         "u_S10000 (mJy)": u_s10000,
-        "Age (Yr)" : query["AGE"][query_id],
-        "a"       : a,
-        "u_a"     : u_a,
-        "c"       : c,
-        "u_c"     : u_c,
-        "vb"      : vb,
-        "u_vb"    : u_vb,
-        "a1"      : a1,
-        "u_a1"    : u_a1,
-        "a2"      : a2,
-        "u_a2"    : u_a2,
-        "vc"      : vc,
-        "u_vc"    : u_vc,
-        "vpeak"   : vpeak,
-        "u_vpeak" : u_vpeak,
-        "beta"    : beta,
-        "u_beta"  : u_beta,
-        "lps_a"     : lps_a,
-        "lps_u_a"   : lps_u_a,
-        "lps_b"     : lps_b,
-        "lps_u_b"   : lps_u_b,
-        "lps_c"     : lps_c,
-        "lps_u_c"   : lps_u_c,
-        "SMART":smart_pulsar,
+        "Age (Yr)": query["AGE"][query_id],
+        "a": a,
+        "u_a": u_a,
+        "c": c,
+        "u_c": u_c,
+        "vb": vb,
+        "u_vb": u_vb,
+        "a1": a1,
+        "u_a1": u_a1,
+        "a2": a2,
+        "u_a2": u_a2,
+        "vc": vc,
+        "u_vc": u_vc,
+        "vpeak": vpeak,
+        "u_vpeak": u_vpeak,
+        "beta": beta,
+        "u_beta": u_beta,
+        "lps_a": lps_a,
+        "lps_u_a": lps_u_a,
+        "lps_b": lps_b,
+        "lps_u_b": lps_u_b,
+        "lps_c": lps_c,
+        "lps_u_c": lps_u_c,
+        "SMART": smart_pulsar,
     }
 
 
@@ -295,9 +304,13 @@ with ProcessPoolExecutor(max_workers=8) as executor:
     futures = {executor.submit(fc_, pulsar): pulsar for pulsar in pulsars_to_process}
 
     # Wrap with tqdm to show progress
-    for future in tqdm(as_completed(futures), total=len(futures), desc="Fitting pulsars"):
+    for future in tqdm(
+        as_completed(futures), total=len(futures), desc="Fitting pulsars"
+    ):
         results.append(future.result())
 
 # Dump to CSV
 df = pd.DataFrame(results)
-df.to_csv('all_pulsar_fits.csv', index=False)
+df.to_csv(
+    f"{os.path.dirname(os.path.realpath(__file__))}/all_pulsar_fits.csv", index=False
+)
