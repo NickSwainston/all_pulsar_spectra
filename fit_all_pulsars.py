@@ -3,8 +3,8 @@ import os
 import matplotlib.pyplot as plt
 import psrqpy
 import shutil
-import torch.multiprocessing as mp
 from functools import partial
+from concurrent.futures import ProcessPoolExecutor, as_completed
 from tqdm import tqdm
 import glob
 import numpy as np
@@ -279,24 +279,25 @@ def fit_and_plot(pulsar):
     }
 
 
-pulsars_to_process = []
-for pulsar in cat_dict.keys():
-    # Skip pulsars without enough data
-    if len(cat_dict[pulsar][0]) < 4:
-        continue
-    pulsars_to_process.append(pulsar)
+# Prepare the list of pulsars
+pulsars_to_process = [
+    pulsar for pulsar in cat_dict.keys() if len(cat_dict[pulsar][0]) >= 4
+]
 
-# Set up CPU multiprocessing
-pbar = tqdm(pulsars_to_process)
-# freeze params/function as object
+# Freeze parameters / function
 fc_ = partial(fit_and_plot)
-# set number of processes
-p = mp.Pool(8)
-# runs mp with params on pbar
-results = list(p.imap(fc_, pbar))
-p.close()
-p.join()
 
-# Dump to csv
+results = []
+
+# Use ProcessPoolExecutor
+with ProcessPoolExecutor(max_workers=8) as executor:
+    # Map tasks to futures
+    futures = {executor.submit(fc_, pulsar): pulsar for pulsar in pulsars_to_process}
+
+    # Wrap with tqdm to show progress
+    for future in tqdm(as_completed(futures), total=len(futures), desc="Fitting pulsars"):
+        results.append(future.result())
+
+# Dump to CSV
 df = pd.DataFrame(results)
 df.to_csv('all_pulsar_fits.csv', index=False)
