@@ -1427,7 +1427,7 @@ with open(
 ) as file:
     file.write("""
 :math:`\\nu_{\mathrm{peak}}` Summary
-=========================================
+====================================
 
 """)
     for line in correlation_tables["vpeak log"]:
@@ -1436,7 +1436,7 @@ with open(
     file.write("""
 
 :math:`\\nu_{\mathrm{peak}}` Histogram
--------------------------------------------
+--------------------------------------
 
 .. image:: histograms/vpeak_histogram.png
     :width: 800
@@ -1462,7 +1462,7 @@ with open(
 with open(f"{docs_dir}/vc_summary.rst", "w") as file:
     file.write("""
 :math:`\\nu_{\mathrm{c}}` Summary
-================================
+================================+
 
 """)
     for line in correlation_tables["vc log"]:
@@ -1472,7 +1472,7 @@ with open(f"{docs_dir}/vc_summary.rst", "w") as file:
 
 
 :math:`\\nu_{\mathrm{c}}` Histogram
-----------------------------------
+-----------------------------------
 
 .. image:: histograms/vc_histogram.png
     :width: 800

@@ -1,0 +1,5 @@
+html/
+build_*
+.cache/
+.bash_history
+.python_history
