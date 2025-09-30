@@ -1,6 +1,7 @@
 # Version comes from env or defaults
 VERSION ?= 2.1.0
 PWD := $(shell pwd)
+OUTPUT_DIR := None
 
 # Default target
 all: compile_docs
@@ -12,11 +13,11 @@ build_$(VERSION): Dockerfile
 
 # Run the spectral fits with multithreading
 fit_all_pulsars: build_$(VERSION) fit_all_pulsars.py
-	docker run --rm --network host -v $(PWD):/root nickswainston/all_pulsar_spectra:$(VERSION) python /root/fit_all_pulsars.py
+	docker run --rm --network host -v $(PWD):/root nickswainston/all_pulsar_spectra:$(VERSION) python /root/fit_all_pulsars.py --output_dir $(OUTPUT_DIR)
 
 # Process the results to make plots, tables and doc pages
 make_docs: fit_all_pulsars all_pulsar_fits.csv make_docs.py
-	docker run --rm --network host -v $(PWD):/root nickswainston/all_pulsar_spectra:$(VERSION) python /root/make_docs.py
+	docker run --rm --network host -v $(PWD):/root nickswainston/all_pulsar_spectra:$(VERSION) python /root/make_docs.py --output_dir $(OUTPUT_DIR)
 
 compile_docs: make_docs docs/index.rst
 	uv venv .venv  --allow-existing && uv pip install -r docs/requirements.txt && uv run sphinx-build docs html

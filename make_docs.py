@@ -4,13 +4,35 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import FuncFormatter
 import numpy as np
 from scipy import stats
+import argparse
+from pathlib import Path
 
 import pulsar_spectra
 from pulsar_spectra.catalogue import collect_catalogue_fluxes
 
 cat_list = collect_catalogue_fluxes()
 
-docs_dir = f"{os.path.dirname(os.path.realpath(__file__))}/docs"
+
+parser = argparse.ArgumentParser(
+    description="Process pulsars and optionally specify output directory."
+)
+parser.add_argument(
+    "-o", "--output_dir",
+    default=os.path.dirname(os.path.realpath(__file__)),
+    help="Directory to save output (default: current directory)"
+)
+args = parser.parse_args()
+script_dir = Path(__file__).resolve().parent
+if args.output_dir is None or args.output_dir == "None":
+    args.output_dir = script_dir
+# If output_dir is relative, make it absolute relative to script_dir
+if not os.path.isabs(args.output_dir):
+    args.output_dir = os.path.join(script_dir, args.output_dir)
+
+# Ensure output directory exists
+os.makedirs(args.output_dir, exist_ok=True)
+
+docs_dir = f"{args.output_dir}/docs"
 
 # Read and organise data
 # -----------------------------------------------------------------------------
@@ -25,7 +47,7 @@ ecolour = "gray"
 alpha = 0.6
 
 # Read in the fits
-df = pd.read_csv(f"{os.path.dirname(os.path.realpath(__file__))}/all_pulsar_fits.csv")
+df = pd.read_csv(f"{args.output_dir}/all_pulsar_fits.csv")
 
 # Grab model specific data frames
 spl_df = df[df["Model"] == "simple_power_law"]
@@ -1423,7 +1445,7 @@ Spectral Index Histogram
 
 # vpeak
 with open(
-    f"{os.path.dirname(os.path.realpath(__file__))}/docs/vpeak_summary.rst", "w"
+    f"{docs_dir}/vpeak_summary.rst", "w"
 ) as file:
     file.write("""
 :math:`\\nu_{\mathrm{peak}}` Summary

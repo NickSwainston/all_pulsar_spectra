@@ -8,6 +8,9 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 from tqdm import tqdm
 import glob
 import numpy as np
+import argparse
+from pathlib import Path
+import logging
 
 from pulsar_spectra.spectral_fit import find_best_spectral_fit, estimate_flux_density
 from pulsar_spectra.catalogue import collect_catalogue_fluxes
@@ -17,67 +20,32 @@ from pulsar_spectra.analysis import calc_log_parabolic_spectrum_max_freq
 cat_dict = collect_catalogue_fluxes()
 query = psrqpy.QueryATNF().pandas
 
-results_record = []
 
-# for output csv
-output_df = pd.DataFrame(
-    columns=[
-        "Pulsar",
-        "ATNF Period (s)",
-        "ATNF Pdot",
-        "ATNF Spin Frequency (Hz)",
-        "ATNF Fdot",
-        "ATNF DM",
-        "ATNF B_surf (G)",
-        "ATNF B_LC (G)",
-        "ATNF E_dot (ergs/s)",
-        "ANTF Binary (type)",
-        "Offset (degrees)",
-        "Model",
-        "Probability Best",
-        "N data flux",
-        "Min freq (MHz)",
-        "Max freq (MHz)",
-        "Bandwidth fit?",
-        "L400 (mJy kpc^2)",
-        "L1400 (mJy kpc^2)",
-        "S150 (mJy)",
-        "u_S150 (mJy)",
-        "S300 (mJy)",
-        "u_S300 (mJy)",
-        "S5000 (mJy)",
-        "u_S5000 (mJy)",
-        "S10000 (mJy)",
-        "u_S10000 (mJy)",
-        "Age (Yr)",
-        "a",
-        "u_a",
-        "c",
-        "u_c",
-        "vb",
-        "u_vb",
-        "a1",
-        "u_a1",
-        "a2",
-        "u_a2",
-        "vc",
-        "u_vc",
-        "vpeak",
-        "u_vpeak",
-        "beta",
-        "u_beta",
-        "lps_a",
-        "lps_u_a",
-        "lps_b",
-        "lps_u_b",
-        "lps_c",
-        "lps_u_c",
-        "SMART",
-    ]
-)
+# Custom logging handler that plays nicely with tqdm
+class TqdmLoggingHandler(logging.Handler):
+    def __init__(self, level=logging.NOTSET):
+        super().__init__(level)
 
+    def emit(self, record):
+        try:
+            msg = self.format(record)
+            tqdm.write(msg)  # ensures progress bar stays intact
+            self.flush()
+        except Exception:
+            self.handleError(record)
 
-def fit_and_plot(pulsar):
+def setup_logger(log_level: str = "INFO"):
+    logger = logging.getLogger()
+    logger.setLevel(getattr(logging, log_level.upper(), logging.INFO))
+    # Remove old handlers
+    logger.handlers.clear()
+    handler = TqdmLoggingHandler()
+    formatter = logging.Formatter("[%(levelname)s] %(message)s")
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+    return logger
+
+def fit_and_plot(pulsar, output_dir, logger):
     # Set up plot
     scale_figure = 0.9
     fig, ax = plt.subplots(
@@ -125,7 +93,7 @@ def fit_and_plot(pulsar):
     else:
         smart_pulsar = False
 
-    print(pulsar)
+    logger.info(f"Fitting pulsar {pulsar}")
     models, iminuit_results, fit_infos, p_best, band_bool = find_best_spectral_fit(
         pulsar,
         freq_all,
@@ -133,14 +101,17 @@ def fit_and_plot(pulsar):
         flux_all,
         flux_err_all,
         ref_all,
-        plot_best=True,  # axis=ax
+        plot_best=True,
     )
 
     if models is not None:
-        fit_loc = glob.glob(f"{pulsar}_*_fit.png")
+        glob_dir = f"{os.getcwd()}/{pulsar}_*_fit.png"
+        output_file_path = f"{output_dir}/docs/best_fits/{pulsar}_fit.png"
+        logger.debug(f"Done. Grabbing file from {glob_dir} and putting in {output_file_path}")
+        fit_loc = glob.glob(glob_dir)
         shutil.move(
             fit_loc[0],
-            f"{os.path.dirname(os.path.realpath(__file__))}/docs/best_fits/{pulsar}_fit.png",
+            output_file_path,
         )
 
         # Calculate luminosity at 2 frequencies
@@ -288,29 +259,68 @@ def fit_and_plot(pulsar):
     }
 
 
-# Prepare the list of pulsars
-pulsars_to_process = [
-    pulsar for pulsar in cat_dict.keys() if len(cat_dict[pulsar][0]) >= 4
-]
+def main():
+    parser = argparse.ArgumentParser(
+        description="Process pulsars and optionally specify output directory."
+    )
+    parser.add_argument(
+        "pulsars_to_process",
+        nargs="*",
+        default=[],
+        help="Names of pulsars to process (default: all)"
+    )
+    parser.add_argument(
+        "-o", "--output_dir",
+        default=None,
+        help="Directory to save output (default: current directory)"
+    )
+    parser.add_argument(
+        "-l", "--logger",
+        default="INFO",
+        help="Logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)"
+    )
+    args = parser.parse_args()
 
-# Freeze parameters / function
-fc_ = partial(fit_and_plot)
+    script_dir = Path(__file__).resolve().parent
+    if args.output_dir is None or args.output_dir == "None":
+        args.output_dir = script_dir
+    # If output_dir is relative, make it absolute relative to script_dir
+    if not os.path.isabs(args.output_dir):
+        args.output_dir = os.path.join(script_dir, args.output_dir)
 
-results = []
+    # Ensure output directory exists
+    os.makedirs(args.output_dir, exist_ok=True)
 
-# Use ProcessPoolExecutor
-with ProcessPoolExecutor(max_workers=8) as executor:
-    # Map tasks to futures
-    futures = {executor.submit(fc_, pulsar): pulsar for pulsar in pulsars_to_process}
+    if not args.pulsars_to_process:
+        # Prepare the list of pulsars
+        args.pulsars_to_process = [
+            pulsar for pulsar in cat_dict.keys() if len(cat_dict[pulsar][0]) >= 4
+        ]
 
-    # Wrap with tqdm to show progress
-    for future in tqdm(
-        as_completed(futures), total=len(futures), desc="Fitting pulsars"
-    ):
-        results.append(future.result())
+    logger = setup_logger(args.logger)
 
-# Dump to CSV
-df = pd.DataFrame(results)
-df.to_csv(
-    f"{os.path.dirname(os.path.realpath(__file__))}/all_pulsar_fits.csv", index=False
-)
+    logger.info(f"Processing {len(args.pulsars_to_process)} pulsars to dir {args.output_dir} ...")
+
+    # Freeze parameters / function
+    fc_ = partial(fit_and_plot)
+
+    results = []
+    # Use ProcessPoolExecutor
+    with ProcessPoolExecutor(max_workers=8) as executor:
+        # Map tasks to futures
+        futures = {executor.submit(fc_, pulsar, args.output_dir, logger): pulsar for pulsar in args.pulsars_to_process}
+
+        # Wrap with tqdm to show progress
+        for future in tqdm(
+            as_completed(futures), total=len(futures), desc="Fitting pulsars"
+        ):
+            results.append(future.result())
+
+    # Dump to CSV
+    df = pd.DataFrame(results)
+    df.to_csv(
+        f"{args.output_dir}/all_pulsar_fits.csv", index=False
+    )
+
+if __name__ == "__main__":
+    main()
