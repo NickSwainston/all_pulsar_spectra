@@ -3,3 +3,7 @@ build_*
 .cache/
 .bash_history
 .python_history
+.nextflow.log*
+.nextflow/
+work/
+results/

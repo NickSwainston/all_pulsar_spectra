@@ -17,7 +17,7 @@ You can also reference this repository using the following DOI:
 Install [pulsar_spectra](https://github.com/NickSwainston/pulsar_spectra) then fit all pulsars spectra with
 
 ```
-fit_all_pulsars.py
+nextflow run fit_pulsars.nf --all --outdir results/ --version 3.0.0 --method bayesian-nested-sampling
 ```
 Then update the docs with
 ```
