@@ -8,45 +8,14 @@ reference frequencies (150, 300, 5000, 10000 MHz) plus luminosities at
 
 import argparse
 import glob
-import inspect
 
 import numpy as np
 import pandas as pd
 import psrqpy
-import yaml
 
+from pulsar_spectra.analysis import estimate_flux_density
 from pulsar_spectra.catalogue import collect_catalogue_fluxes
-from pulsar_spectra.models import model_settings
-
-
-def _flux_mJy(model_name, params, freq_MHz):
-    """Evaluate model flux at *freq_MHz* (MHz) → mJy.
-
-    Converts params from user units (MHz / mJy) back to internal units
-    (Hz / Jy) before calling the model function, then returns mJy.
-    Returns None if the model is unknown or evaluation fails.
-    """
-    model_dict = model_settings()
-    if model_name not in model_dict:
-        return None
-    model_func = model_dict[model_name][0]
-    # Parameter names of the model function, excluding the first arg ('v')
-    sig_keys = list(inspect.signature(model_func).parameters.keys())[1:]
-    internal_vals = []
-    for p in sig_keys:
-        val = params[p]
-        if p.startswith("v"):
-            internal_vals.append(val * 1e6)   # MHz → Hz
-        elif p == "c":
-            internal_vals.append(val / 1e3)   # mJy → Jy
-        else:
-            internal_vals.append(val)
-    v_Hz = np.array([freq_MHz * 1e6])
-    try:
-        flux_Jy = model_func(v_Hz, *internal_vals)
-        return float(flux_Jy[0] * 1e3)        # Jy → mJy
-    except Exception:
-        return None
+from pulsar_spectra.spectral_fit import load_results_yaml
 
 
 def main():
@@ -71,10 +40,8 @@ def main():
     # Load all fit results
     fit_results = {}
     for path in yaml_paths:
-        with open(path) as fh:
-            data = yaml.safe_load(fh)
-        if data:
-            fit_results.update(data)
+        data = load_results_yaml(path)
+        fit_results.update(data)
 
     pulsars = list(fit_results.keys())
     print(f"Loaded results for {len(pulsars)} pulsars")
@@ -89,9 +56,8 @@ def main():
 
     rows = []
     for pulsar, result in fit_results.items():
-        model  = result.get("model")
-        params = result.get("params") or {}
-        p_errs = result.get("param_errs") or {}
+        params = result.params
+        p_errs = result.param_errs
 
         # --- ATNF properties ---
         q = atnf.get(pulsar, {})
@@ -127,24 +93,24 @@ def main():
             smart_pulsar = False
 
         # --- Flux density estimates ---
-        s150 = s300 = s5000 = s10000 = None
+        s150 = u_s150 = s300 = u_s300 = s5000 = u_s5000 = s10000 = u_s10000 = None
         l400 = l1400 = None
-        if model is not None:
-            s150   = _flux_mJy(model, params, 150)
-            s300   = _flux_mJy(model, params, 300)
-            s5000  = _flux_mJy(model, params, 5000)
-            s10000 = _flux_mJy(model, params, 10000)
+        print(result)
+        if result.model is not None:
+            fluxes, errs = estimate_flux_density([150, 300, 400, 1400, 5000, 10000], result)
+            s150,   u_s150   = float(fluxes[0]), float(errs[0])
+            s300,   u_s300   = float(fluxes[1]), float(errs[1])
+            s400  = float(fluxes[2])
+            s1400 = float(fluxes[3])
+            s5000,  u_s5000  = float(fluxes[4]), float(errs[4])
+            s10000, u_s10000 = float(fluxes[5]), float(errs[5])
             try:
                 dist_f = float(dist)
                 if not np.isnan(dist_f):
-                    s400  = _flux_mJy(model, params, 400)
-                    s1400 = _flux_mJy(model, params, 1400)
-                    if s400  is not None:
-                        l400  = s400  * dist_f ** 2
-                    if s1400 is not None:
-                        l1400 = s1400 * dist_f ** 2
-            except (TypeError, ValueError):
-                pass
+                    l400  = s400  * dist_f ** 2
+                    l1400 = s1400 * dist_f ** 2
+            except (TypeError, ValueError) as e:
+                print(f"Error calculating luminosity for {pulsar}: {e}")
 
         rows.append({
             "Pulsar":                  pulsar,
@@ -157,34 +123,38 @@ def main():
             "ATNF B_LC (G)":           b_lc,
             "ATNF E_dot (ergs/s)":     edot,
             "ANTF Binary (type)":      binary,
-            "Model":                   model,
-            "Probability Best":        result.get("p_best"),
+            "Model":                   result.model,
+            "Probability Best":        result.p_best,
             "Min freq (MHz)":          min_freq,
             "Max freq (MHz)":          max_freq,
-            "N data flux":             result.get("n_data"),
-            "Bandwidth fit?":          result.get("band_bool"),
+            "N data flux":             result.n_data,
+            "Bandwidth fit?":          result.band_bool,
             "L400 (mJy kpc^2)":        l400,
             "L1400 (mJy kpc^2)":       l1400,
             "S150 (mJy)":              s150,
+            "u_S150 (mJy)":            u_s150,
             "S300 (mJy)":              s300,
+            "u_S300 (mJy)":            u_s300,
             "S5000 (mJy)":             s5000,
+            "u_S5000 (mJy)":           u_s5000,
             "S10000 (mJy)":            s10000,
+            "u_S10000 (mJy)":          u_s10000,
             "Age (Yr)":                age,
             # Model-specific parameters (None where not applicable)
             "a":       params.get("a"),
             "u_a":     p_errs.get("a"),
-            "c":       params.get("c"),
-            "u_c":     p_errs.get("c"),
-            "vb":      params.get("vb"),
-            "u_vb":    p_errs.get("vb"),
+            "c_mJy":       params.get("c_mJy"),
+            "u_c_mJy":     p_errs.get("c_mJy"),
+            "vb_MHz":      params.get("vb_MHz"),
+            "u_vb_MHz":    p_errs.get("vb_MHz"),
             "a1":      params.get("a1"),
             "u_a1":    p_errs.get("a1"),
             "a2":      params.get("a2"),
             "u_a2":    p_errs.get("a2"),
-            "vc":      params.get("vc"),
-            "u_vc":    p_errs.get("vc"),
-            "vpeak":   params.get("vpeak"),
-            "u_vpeak": p_errs.get("vpeak"),
+            "vc_MHz":      params.get("vc_MHz"),
+            "u_vc_MHz":    p_errs.get("vc_MHz"),
+            "vpeak_MHz":   params.get("vpeak_MHz"),
+            "u_vpeak_MHz": p_errs.get("vpeak_MHz"),
             "beta":    params.get("beta"),
             "u_beta":  p_errs.get("beta"),
             "SMART":   smart_pulsar,
