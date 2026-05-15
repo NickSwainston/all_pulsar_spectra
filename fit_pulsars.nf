@@ -2,16 +2,18 @@
 
 nextflow.enable.dsl = 2
 
-params.all         = false
-params.pulsars     = ""
-params.outdir      = "results"
-params.loglvl      = "INFO"
-params.version     = "2.1.0"
-params.method      = "maximum-likelihood"
-params.plot_type   = "best"
-params.legend      = "raw"
-params.likelihood  = "t"
-params.cpus        = 1  // cores per fit job; also passed as --npool to quick-fit
+params.all             = false
+params.pulsars         = ""
+params.outdir          = "results"
+params.loglvl          = "INFO"
+params.version         = "2.1.0"
+params.method          = "maximum-likelihood"
+params.plot_type       = "best"
+params.plot_image_type = "webp"
+params.legend          = "raw"
+params.likelihood      = "t"
+params.cpus            = 1  // cores per fit job; also passed as --npool to quick-fit
+params.max_cpus        = 8  // total cores available locally
 
 // ---------------------------------------------------------------------------
 // Process 1: find which pulsars to fit
@@ -50,6 +52,7 @@ process FIT_PULSAR {
         -L ${params.loglvl} \
         -m ${params.method} \
         -t ${params.plot_type} \
+        -i ${params.plot_image_type} \
         -s ${params.legend} \
         -l ${params.likelihood} \
         -n ${task.cpus}
